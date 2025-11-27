@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>時光行者：秦漢風雲 (最終完美版)</title>
+    <title>時光行者：秦漢風雲 (最終完美修復版)</title>
     
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,81 +16,139 @@
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 1. 復古主題配色與字體 */
+        /* --- 全局設定 --- */
         body {
             font-family: 'DotGothic16', 'Noto Serif TC', monospace;
-            background-color: #222034;
-            color: #E8E8E8;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
             overflow-x: hidden;
-            background-image: repeating-linear-gradient(45deg, #3b3a5d 0, #3b3a5d 1px, #222034 1px, #222034 5px);
+            /* 復古網格背景 */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        /* 2. 遊戲主容器 - 像素邊框風格 */
+        /* --- 遊戲容器 --- */
         .game-container {
+            background-color: #222034; /* 深紫灰底色 */
             border: 4px solid #5C5B7F;
-            box-shadow: 8px 8px 0px 0px #1A192A;
-            background-color: #4B4B6F;
-        }
-        
-        /* 3. 按鈕樣式 */
-        .game-btn {
-            background-color: #736E9B; 
-            border: 3px solid #5C5B7F; 
-            transition: all 0.1s;
-            cursor: pointer;
-            box-shadow: 4px 4px 0px 0px #1A192A;
+            box-shadow: 
+                0 0 0 4px #1a1a1a,
+                0 20px 50px rgba(0,0,0,0.9);
             position: relative;
         }
-        .game-btn:hover:not(:disabled) {
-            background-color: #8C88B0;
-            transform: translateY(-1px);
-        }
-        .game-btn:active:not(:disabled) {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0px 0px #1A192A;
-        }
-        .game-btn.selected {
-            background-color: #4a4238;
-            border-color: #d4af37;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+
+        /* --- 核心修復：像素色塊選項按鈕 --- */
+        .option-block {
+            position: relative;
+            display: block;
+            width: 100%;
+            background-color: #383850; /* 預設深色塊 */
+            color: #fff;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            
+            /* 像素立體邊框效果 */
+            border: 3px solid;
+            border-color: #5d5d8a #1e1e2e #1e1e2e #5d5d8a; /* 左上亮，右下暗 */
+            
+            /* 硬陰影 */
+            box-shadow: 4px 4px 0px #111;
+            
+            transition: transform 0.1s, background-color 0.1s;
+            text-align: left;
         }
 
-        /* 4. 圖片容器 */
+        /* 滑鼠懸停 */
+        .option-block:hover:not(.disabled):not(.selected) {
+            background-color: #4b4b70;
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0px #111;
+            border-color: #7a7aae #2a2a4a #2a2a4a #7a7aae;
+        }
+
+        /* 選中狀態 (金色高亮) */
+        .option-block.selected {
+            background-color: #e6c229; /* 金色 */
+            color: #2a2a4a; /* 深色文字 */
+            border-color: #ffe66d #b39200 #b39200 #ffe66d;
+            transform: translate(2px, 2px); /* 下壓效果 */
+            box-shadow: 2px 2px 0px #111; /* 陰影變小 */
+            cursor: default;
+        }
+
+        /* 禁用/未選中狀態 (變暗) */
+        .option-block.disabled {
+            background-color: #252530;
+            color: #555;
+            border-color: #333 #111 #111 #333;
+            transform: translate(2px, 2px);
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* --- 下一步按鈕 (綠色) --- */
+        .next-btn {
+            background-color: #4caf50;
+            border: 3px solid;
+            border-color: #81c784 #2e7d32 #2e7d32 #81c784;
+            color: white;
+            box-shadow: 2px 2px 0 #111;
+        }
+        .next-btn:hover { background-color: #66bb6a; }
+        .next-btn:active { transform: translate(2px, 2px); box-shadow: none; border-color: #2e7d32; }
+
+        /* --- 圖片容器 --- */
         .scene-image-container {
             border: 4px solid #2b2b2b;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-            image-rendering: pixelated;
-            background-color: #1a1a1a;
+            image-rendering: pixelated; /* 像素圖不模糊 */
+            background-color: #000;
             min-height: 250px;
         }
 
-        /* 5. 浮動數值動畫 */
+        /* --- 進度條 --- */
+        .progress-container {
+            background-color: #111;
+            border: 2px solid #444;
+            height: 16px;
+            position: relative;
+            border-radius: 2px;
+        }
+        .progress-fill {
+            height: 100%;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* 彈性動畫 */
+        }
+
+        /* --- 浮動數值 --- */
         .stat-float {
             position: absolute;
-            animation: floatUp 2.5s ease-out forwards;
+            animation: floatUp 2s ease-out forwards;
             font-weight: 900;
             pointer-events: none;
             z-index: 100;
             text-shadow: 2px 2px 0px #000;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: #F8F4A6;
         }
         @keyframes floatUp {
             0% { opacity: 0; transform: translateY(10px); }
-            15% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-60px); }
+            20% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
         }
         
-        /* 6. 震動效果 */
+        /* 震動 */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
         }
-        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
 
-        /* 滾動條美化 */
+        /* 滾動條 */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: #222034; }
         ::-webkit-scrollbar-thumb { background: #5C5B7F; border: 2px solid #222034; }
@@ -102,7 +160,96 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- 圖片資源路徑 ---
+        // --- 音效系統 ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const playSound = (type) => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            switch (type) {
+                case 'type': // 打字聲
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(800 + Math.random()*200, now);
+                    gainNode.gain.setValueAtTime(0.03, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.03);
+                    break;
+                case 'select': // 點擊聲
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.setValueAtTime(220, now);
+                    oscillator.frequency.linearRampToValueAtTime(440, now + 0.1);
+                    gainNode.gain.setValueAtTime(0.1, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.1);
+                    break;
+                case 'confirm': // 確認聲
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(440, now);
+                    oscillator.frequency.setValueAtTime(880, now + 0.1);
+                    gainNode.gain.setValueAtTime(0.1, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.3);
+                    break;
+                case 'error': // 錯誤聲
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(150, now);
+                    oscillator.frequency.linearRampToValueAtTime(100, now + 0.2);
+                    gainNode.gain.setValueAtTime(0.2, now);
+                    gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    oscillator.start(now);
+                    oscillator.stop(now + 0.2);
+                    break;
+            }
+        };
+
+        // --- 打字機組件 ---
+        const TypewriterText = ({ text, onComplete }) => {
+            const [displayedText, setDisplayedText] = useState('');
+            const indexRef = useRef(0);
+            
+            useEffect(() => {
+                setDisplayedText('');
+                indexRef.current = 0;
+                const timer = setInterval(() => {
+                    if (indexRef.current < text.length) {
+                        const char = text.charAt(indexRef.current);
+                        setDisplayedText((prev) => prev + char);
+                        if (char !== ' ' && Math.random() > 0.6) playSound('type'); // 隨機觸發打字音
+                        indexRef.current++;
+                    } else {
+                        clearInterval(timer);
+                        if (onComplete) onComplete();
+                    }
+                }, 20);
+                return () => clearInterval(timer);
+            }, [text]);
+
+            return <span>{displayedText}</span>;
+        };
+
+        // --- 進度條組件 (像素風格) ---
+        const StatBar = ({ label, value, max = 150, color, icon }) => {
+            const percent = Math.min(100, Math.max(0, (value / max) * 100));
+            return (
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="w-6 text-center text-xl filter drop-shadow-md">{icon}</div>
+                    <div className="w-10 text-xs font-bold text-gray-300 text-right tracking-widest">{label}</div>
+                    <div className="flex-grow progress-container">
+                        <div className={`progress-fill ${color}`} style={{ width: `${percent}%` }}></div>
+                    </div>
+                    <div className="w-8 text-right text-xs font-mono text-white drop-shadow">{value}</div>
+                </div>
+            );
+        };
+
+        // --- 圖片路徑 (本地檔案) ---
         const SceneImages = {
             Classroom: "1.Classroom.webp",
             QinPalace: "2.QinPalace.webp",
@@ -126,360 +273,71 @@
 
         // --- UI 圖示 ---
         const Icons = {
-            Heart: () => <span>❤</span>,
-            Brain: () => <span>🧠</span>,
-            Coin: () => <span>💰</span>,
+            Heart: () => <span>❤️</span>,
+            Brain: () => <span>🧿</span>,
+            Coin: () => <span>🪙</span>,
             Star: () => <span>👑</span>,
             ArrowRight: () => <span>▶</span>,
             Refresh: () => <span>↺</span>
         };
 
-        // --- 歷史問答資料庫 (NPC 隨機事件) ---
-        const historyQuizPool = [
-            { npc: "李斯", role: "秦朝丞相", question: "吾提議廢分封，行郡縣。你可知秦朝將天下分為多少郡？", options: ["十二郡", "三十六郡", "四十八郡", "八十一郡"], answer: 1, correctMsg: "然也！集權中央，方能長治久安。", wrongMsg: "謬矣！連這等國策都不知？", reward: { knowledge: 10, prestige: 5 }, penalty: { knowledge: -5 } },
-            { npc: "荊軻", role: "燕國刺客", question: "風蕭蕭兮易水寒... 下一句為何？", options: ["壯士一去兮不復還", "大風起兮雲飛揚", "力拔山兮氣蓋世", "此恨綿綿無絕期"], answer: 0, correctMsg: "好！懂我者，壯士也！", wrongMsg: "哼，不懂風雅之輩。", reward: { health: 10, reputation: 5 }, penalty: { reputation: -5 } },
-            { npc: "韓信", role: "大將軍", question: "吾背水一戰擊敗趙軍，置之死地而後生。請問此戰發生在何處？", options: ["鉅鹿", "井陘", "垓下", "官渡"], answer: 1, correctMsg: "兵法之道，存乎一心。", wrongMsg: "連戰場方位都分不清，如何帶兵？", reward: { reputation: 15 }, penalty: { health: -10 } },
-            { npc: "張騫", role: "博望侯", question: "吾出使西域，主要目的是為了聯合哪個國家夾擊匈奴？", options: ["大宛", "烏孫", "大月氏", "樓蘭"], answer: 2, correctMsg: "正是！雖未結盟，卻鑿空西域。", wrongMsg: "非也，看來你對西域局勢一無所知。", reward: { knowledge: 10, wealth: 10 }, penalty: { wealth: -5 } },
-            { npc: "司馬遷", role: "太史令", question: "吾寫《史記》，立誓要「究天人之際」... 下句為何？", options: ["成一家之言", "通古今之變", "流芳百世", "以史為鏡"], answer: 1, correctMsg: "知我者謂我心憂。", wrongMsg: "唉，豎子不足與謀。", reward: { knowledge: 15 }, penalty: { knowledge: -10 } },
-            { npc: "董仲舒", role: "儒學大師", question: "吾向武帝建議「罷黜百家」，獨尊哪一家？", options: ["道家", "法家", "墨家", "儒家"], answer: 3, correctMsg: "善哉，教化萬民，唯有儒術。", wrongMsg: "朽木不可雕也。", reward: { prestige: 10, knowledge: 5 }, penalty: { prestige: -5 } },
-            { npc: "王昭君", role: "和親公主", question: "為了漢匈和平，我嫁給了哪位單于？", options: ["冒頓單于", "呼韓邪單于", "伊稚斜單于", "軍臣單于"], answer: 1, correctMsg: "願邊疆永無戰火。", wrongMsg: "連夫君名字都記錯，令人心寒。", reward: { reputation: 15 }, penalty: { reputation: -10 } },
-            { npc: "蔡倫", role: "宦官/發明家", question: "我改良了造紙術，主要使用了什麼原料降低成本？", options: ["絲綢", "樹皮與破布", "羊皮", "竹簡"], answer: 1, correctMsg: "物盡其用，方能惠及天下。", wrongMsg: "若用那昂貴之物，百姓如何用紙？", reward: { knowledge: 10, wealth: 5 }, penalty: { wealth: -5 } },
-            { npc: "張角", role: "太平道首領", question: "蒼天已死，黃天當立，歲在...？", options: ["甲子", "乙丑", "丙寅", "丁卯"], answer: 0, correctMsg: "天下大吉！加入我們吧！", wrongMsg: "天時未到？你非我道中人。", reward: { health: 10, wealth: 10 }, penalty: { reputation: -10 } },
-            { npc: "項羽", role: "西楚霸王", question: "吾與劉邦爭奪天下，最後決戰於何處？", options: ["鴻門", "咸陽", "垓下", "彭城"], answer: 2, correctMsg: "力拔山兮氣蓋世，時不利兮騅不逝...", wrongMsg: "胡說八道！", reward: { health: 15 }, penalty: { health: -20 } }
-        ];
-
-        // --- 歷史劇本資料 ---
+        // --- 歷史劇本資料 (完整 25 關) ---
         const storyNodes = {
-            "intro": {
-                id: "intro",
-                title: "序章：歷史的召喚",
-                text: "西元2024年。歷史課上，老師講述著：「秦皇漢武，略輸文采...」你的思緒飄向了兩千年前的時空漩渦。",
-                image: "Classroom",
-                options: [
-                    { text: "認真聽課", nextId: "qin_war", effect: { knowledge: 10 }, feedback: "知識就是力量。", historyNote: "歷史學習能幫助我們以古鑑今，了解朝代興衰的規律。" },
-                    { text: "睡覺儲存體力", nextId: "qin_war", effect: { health: 10 }, feedback: "精神飽滿地穿越了。", historyNote: "穿越小說中，主角往往是在睡夢或意外中回到古代。" },
-                    { text: "偷看課外書", nextId: "qin_war", effect: { wealth: 5, reputation: -5 }, feedback: "你獲得了一些雜學知識，但被老師瞪了一眼。", historyNote: "古代也有「閒書」，如《山海經》。" }
-                ]
-            },
-            // 1. 秦滅六國 (軍事)
-            "qin_war": {
-                id: "qin_war",
-                title: "1. 秦滅六國 (BC 230-221)",
-                text: "你置身於秦軍大帳。秦王嬴政欲一統天下，滅國之戰一觸即發。你現在是一名秦軍謀士。",
-                image: "War",
-                options: [
-                    { text: "獻計「遠交近攻」", nextId: "qin_system", effect: { knowledge: 15, reputation: 10, health: -5, wealth: 10 }, feedback: "你的策略加速了六國的滅亡！", historyNote: "范雎向秦昭王提出「遠交近攻」，先攻打鄰近的韓魏，暫時聯絡遠方的齊國，這是秦統一的關鍵戰略。" },
-                    { text: "親上前線殺敵", nextId: "qin_system", effect: { health: -10, wealth: 20, reputation: 5 }, feedback: "你獲得了秦國的軍功爵位。", historyNote: "商鞅變法後，秦國實行軍功爵制，平民可以通過斬首敵軍獲得爵位和田宅，大大激勵了秦軍戰鬥力。" },
-                    { text: "擔任軍需官", nextId: "qin_system", effect: { wealth: 30, reputation: -5 }, feedback: "你確保了糧草充足。", historyNote: "秦國擁有發達的農業和水利（如鄭國渠、都江堰），為統一戰爭提供了堅實的後勤保障。" }
-                ]
-            },
-            // 2. 郡縣制 vs 分封制 (政治)
-            "qin_system": {
-                id: "qin_system",
-                title: "2. 制度之爭 (BC 221)",
-                text: "天下初定，朝廷上正在爭論實行「郡縣制」還是「分封制」。丞相王綰主張分封，廷尉李斯主張郡縣。",
-                image: "QinPalace",
-                options: [
-                    { text: "支持李斯，推行郡縣制", nextId: "qin_standard", effect: { knowledge: 20, reputation: 10 }, feedback: "秦始皇採納了建議，中央集權確立！", historyNote: "李斯反對分封子弟，認為這會導致像周朝一樣的諸侯混戰。秦始皇最終將天下分為三十六郡，由中央直接管轄。" },
-                    { text: "支持王綰，主張分封", nextId: "qin_standard", effect: { reputation: -10 }, feedback: "秦始皇駁回了你的建議。", historyNote: "王綰認為燕、齊、楚等地偏遠，不分封王侯難以鎮守，但此觀點未被採納。" },
-                    { text: "保持沈默", nextId: "qin_standard", effect: { health: 0 }, feedback: "你選擇了旁觀。", historyNote: "在秦朝廷議中，官員可以表達意見，但最終決策權在皇帝手中。" }
-                ]
-            },
-            // 3. 統一度量衡與文字 (經濟/文化)
-            "qin_standard": {
-                id: "qin_standard",
-                title: "3. 車同軌，書同文 (BC 221)",
-                text: "秦始皇下令統一度量衡、貨幣與文字。市井之間，舊貨幣與舊文字正在被廢除。",
-                image: "Treasury",
-                options: [
-                    { text: "學習並推廣小篆 (需智力20)", nextId: "qin_construction", reqKnowledge: 20, effect: { knowledge: 15, reputation: 10, wealth: 10 }, feedback: "你成為了新文字的推廣者。", historyNote: "秦統一文字為小篆（後演變為隸書），這對中華文化的傳承和統一有著決定性的影響。" },
-                    { text: "兌換秦半兩錢", nextId: "qin_construction", effect: { wealth: 20 }, feedback: "你利用貨幣統一的機會賺了一筆。", historyNote: "秦始皇廢除六國貨幣，規定以圓形方孔的「秦半兩」為通行貨幣，這種形制沿用了兩千多年。" },
-                    { text: "私藏六國舊幣", nextId: "qin_construction", effect: { wealth: -10, reputation: -5 }, feedback: "舊幣成了廢銅爛鐵。", historyNote: "統一度量衡（度：長度，量：容積，衡：重量）消除了各地貿易障礙，但也讓舊標準失效。" }
-                ]
-            },
-            // 4. 大興土木 (勞役)
-            "qin_construction": {
-                id: "qin_construction",
-                title: "4. 長城與阿房宮 (BC 215)",
-                text: "北方匈奴威脅，南方征討百越。秦始皇同時下令修築長城、馳道與阿房宮，徭役繁重。",
-                image: "GreatWall",
-                options: [
-                    { text: "參與修築長城 (需體力30)", nextId: "qin_law", reqHealth: 30, effect: { health: -30, reputation: 20, wealth: 10 }, feedback: "孟姜女的哭聲猶在耳邊，但你守護了邊疆。", historyNote: "秦長城西起臨洮，東至遼東。雖然防禦了匈奴，但繁重的徭役也是秦朝滅亡的重要原因。" },
-                    { text: "捐資以此免除勞役 (需財富40)", nextId: "qin_law", reqWealth: 40, effect: { wealth: -40, health: 10, reputation: -5 }, feedback: "有錢能使鬼推磨，你躲過了苦役。", historyNote: "秦律允許通過繳納罰金（貲）或糧食來贖罪或免除部分勞役，體現了法律的階級性。" },
-                    { text: "逃避勞役被抓", nextId: "qin_law", effect: { health: -50, wealth: -20, reputation: -10 }, feedback: "你被抓去修馳道，受盡折磨。", historyNote: "秦朝法律嚴苛，逃避徭役會受到嚴厲懲罰，甚至被罰為「城旦舂」（築城或舂米）。" }
-                ]
-            },
-            // 5. 嚴刑峻法 (法律)
-            "qin_law": {
-                id: "qin_law",
-                title: "5. 連坐法之威 (BC 213)",
-                text: "秦法嚴苛，實行連坐。鄰居犯法，你也可能受牽連。路上偶遇【李斯】。",
-                image: "Prison",
-                options: [
-                    { text: "向李斯請教法家思想", nextId: "qin_burn", effect: { knowledge: 20, reputation: -10 }, feedback: "李斯：「以法為教，以吏為師。」你深感震撼。", historyNote: "韓非子的法家思想是秦朝統治的理論基礎，強調君主集權、嚴刑峻法和以法治國。" },
-                    { text: "舉報鄰居偷盜", nextId: "qin_burn", effect: { wealth: 30, reputation: -20 }, feedback: "你獲得了賞金，但鄰里視你為惡人。", historyNote: "商鞅變法設立「什伍連坐」，一家犯法，鄰里若不告發則同罪，告發則有賞。" },
-                    { text: "幫助鄰居隱瞞", nextId: "qin_burn", effect: { reputation: 20, health: -20 }, feedback: "你保住了鄰居，但時刻擔心被發現。", historyNote: "儒家主張「父為子隱，子為父隱」，這與法家的連坐精神是背道而馳的。" }
-                ]
-            },
-            // 6. 焚書坑儒
-            "qin_burn": {
-                id: "qin_burn",
-                title: "6. 焚書坑儒 (BC 213)",
-                text: "博士淳于越建議分封，觸怒始皇。李斯建議焚書。咸陽城內火光沖天。",
-                image: "Fire",
-                options: [
-                    { text: "冒死藏書 (需體力20)", nextId: "qin_end", reqHealth: 20, effect: { reputation: 30, health: -20, knowledge: 10 }, feedback: "你保住了文化的火種。", historyNote: "秦始皇下令燒毀民間藏書，只保留醫藥、卜筮、種樹之書，並活埋了460多名方士和儒生。" },
-                    { text: "交出藏書", nextId: "qin_end", effect: { reputation: -10, knowledge: -5 }, feedback: "你選擇了順從。", historyNote: "焚書坑儒對先秦文化造成了毀滅性打擊，許多典籍從此失傳。" },
-                    { text: "冷眼旁觀", nextId: "qin_end", effect: { health: 0 }, feedback: "你選擇明哲保身。", historyNote: "高壓政策雖然一時統一了思想，但也埋下了反抗的種子。" }
-                ]
-            },
-            // 7. 秦朝滅亡
-            "qin_end": {
-                id: "qin_end",
-                title: "7. 帝國崩塌 (BC 207)",
-                text: "始皇駕崩，秦二世暴政。陳勝吳廣起義，天下大亂。劉邦攻入咸陽。",
-                image: "War",
-                options: [
-                    { text: "投靠劉邦", nextId: "han_early", effect: { knowledge: 10, reputation: 10, wealth: 10 }, feedback: "你選擇了正確的隊伍，約法三章得民心。", historyNote: "劉邦進入咸陽後，廢除秦朝苛法，與父老約法三章：「殺人者死，傷人及盜抵罪」，贏得了民心。" },
-                    { text: "投靠項羽", nextId: "han_early", effect: { health: 10, wealth: 10, reputation: -5 }, feedback: "項羽火燒阿房宮，你雖搶得財寶，卻感嘆文明毀滅。", historyNote: "項羽雖然勇猛，但屠城和火燒阿房宮的行為失去了民心，最終在楚漢相爭中敗給了劉邦。" },
-                    { text: "逃回鄉里", nextId: "han_early", effect: { health: 5, wealth: -5 }, feedback: "你保全了性命，等待新朝建立。", historyNote: "秦末戰亂導致人口銳減，許多百姓流離失所。" }
-                ]
-            },
-            // 8. 漢初無為
-            "han_early": {
-                id: "han_early",
-                title: "8. 黃老之術 (BC 202-180)",
-                text: "漢朝初建，民生凋敝。朝廷推行「無為而治」，休養生息。偶遇【曹參】。",
-                image: "Farm",
-                options: [
-                    { text: "響應歸農，開墾荒地", nextId: "han_wenjing", effect: { health: 10, wealth: 20, reputation: 5 }, feedback: "蕭規曹隨，天下太平。", historyNote: "漢初統治者吸取秦亡教訓，採用道家黃老之術，輕徭薄賦，讓百姓休養生息。" },
-                    { text: "研讀道家經典", nextId: "han_wenjing", effect: { knowledge: 20, reputation: 5 }, feedback: "你領悟了清靜無為的道理。", historyNote: "在漢武帝獨尊儒術之前，黃老思想是漢初的主流政治思想。" },
-                    { text: "協助官府", nextId: "han_wenjing", effect: { prestige: 10 }, feedback: "你參與了地方治理。", historyNote: "漢初政治清明，官吏多奉行簡政放權。" }
-                ]
-            },
-            // 9. 文景之治
-            "han_wenjing": {
-                id: "han_wenjing",
-                title: "9. 文景之治 (BC 180-141)",
-                text: "輕徭薄賦，百姓富庶。國庫裡的錢繩都爛了。這是中國歷史上第一個盛世。",
-                image: "Treasury",
-                options: [
-                    { text: "大力經商", nextId: "han_seven_states", effect: { wealth: 50, knowledge: 5 }, feedback: "你成為了長安城的富商。", historyNote: "文景時期商業繁榮，商人地位有所提升，但仍受「重農抑商」政策限制。" },
-                    { text: "興辦私學", nextId: "han_seven_states", effect: { knowledge: 20, reputation: 20, wealth: -10 }, feedback: "你桃李滿天下。", historyNote: "漢文帝廢除了秦朝的「挾書律」，民間講學之風興起，文化開始復甦。" },
-                    { text: "享受盛世", nextId: "han_seven_states", effect: { health: 20, wealth: -20 }, feedback: "你度過了一段快樂的時光。", historyNote: "文景之治是中國歷史上第一個盛世，百姓生活富足。" }
-                ]
-            },
-            // 10. 七國之亂
-            "han_seven_states": {
-                id: "han_seven_states",
-                title: "10. 七國之亂 (BC 154)",
-                text: "漢景帝採納晁錯建議「削藩」，吳王劉濞聯合六國起兵造反。戰火逼近。",
-                image: "War",
-                options: [
-                    { text: "投身周亞夫軍平叛 (需聲望20)", nextId: "han_wu_ideology", reqReputation: 20, effect: { reputation: 30, health: -20, wealth: 20 }, feedback: "三個月平定七國之亂，你立下戰功！", historyNote: "周亞夫僅用三個月就平定了七國之亂，加強了中央集權，為漢武帝的大一統奠定了基礎。" },
-                    { text: "捐資助軍", nextId: "han_wu_ideology", effect: { wealth: -30, reputation: 10 }, feedback: "你的財富幫助朝廷穩定了局勢。", historyNote: "漢景帝為了平叛，殺了晁錯試圖謝罪，但叛軍並未停止，最終只能武力平定。" },
-                    { text: "躲避戰亂", nextId: "han_wu_ideology", effect: { health: 5, wealth: -10, reputation: -5 }, feedback: "你平安度過，但錯失了建功立業的機會。", historyNote: "七國之亂後，諸侯王的權力被大幅削弱，再也無力對抗中央。" }
-                ]
-            },
-            // 11. 獨尊儒術
-            "han_wu_ideology": {
-                id: "han_wu_ideology",
-                title: "11. 獨尊儒術 (BC 134)",
-                text: "漢武帝即位，採納【董仲舒】建議，「罷黜百家，獨尊儒術」，建立太學。",
-                image: "Study",
-                options: [
-                    { text: "進入太學攻讀五經 (需智力30)", nextId: "han_wu_eco", reqKnowledge: 30, effect: { knowledge: 30, reputation: 10, health: -5 }, feedback: "你成為了天子門生，士人政府的一員。", historyNote: "太學是漢代最高學府，專門教授儒家五經。成績優秀者可直接做官，這開啟了士人政府的局面。" },
-                    { text: "堅持黃老思想", nextId: "han_wu_eco", effect: { reputation: -10, knowledge: 5 }, feedback: "你的思想已不合時宜，仕途受阻。", historyNote: "儒家思想從此成為中國兩千多年的正統思想，強調君權神授和大一統。" },
-                    { text: "學習法家刑名", nextId: "han_wu_eco", effect: { reputation: 5, knowledge: 10, wealth: 10 }, feedback: "漢朝實為「儒表法裡」。", historyNote: "漢武帝雖然獨尊儒術，但實際上也重用酷吏，實行嚴刑峻法。" }
-                ]
-            },
-            // 12. 鹽鐵官營
-            "han_wu_eco": {
-                id: "han_wu_eco",
-                title: "12. 鹽鐵官營 (BC 119)",
-                text: "為籌措軍費，漢武帝任用【桑弘羊】推行鹽鐵官營、均輸平準。商人們議論紛紛。",
-                image: "Treasury",
-                options: [
-                    { text: "支持官營，打擊囤積", nextId: "han_zhang_qian", effect: { reputation: 10, wealth: 20, knowledge: 10 }, feedback: "國庫充盈，為北伐提供了基礎。", historyNote: "鹽鐵官營將最賺錢的鹽鐵行業收歸國有，極大增加了財政收入，但也打擊了民間工商業。" },
-                    { text: "反對官營，為民請命", nextId: "han_zhang_qian", effect: { reputation: 20, wealth: -10, knowledge: 10 }, feedback: "你贏得了民間商賈的尊重，但得罪了朝廷。", historyNote: "漢昭帝時曾召開「鹽鐵會議」，辯論官營政策的得失，這是中國歷史上著名的經濟政策大辯論。" },
-                    { text: "私下倒賣鹽鐵", nextId: "han_zhang_qian", effect: { wealth: 40, health: -10 }, feedback: "你富可敵國，但冒著極大風險。", historyNote: "雖然有官營政策，但私鹽販賣從未停止，往往伴隨著高額利潤和嚴厲懲罰。" }
-                ]
-            },
-            // 13. 張騫通西域
-            "han_zhang_qian": {
-                id: "han_zhang_qian",
-                title: "13. 鑿空西域 (BC 138-126)",
-                text: "【張騫】出使西域，尋找大月氏夾擊匈奴。這是一條充滿未知與危險的道路。",
-                image: "Map",
-                options: [
-                    { text: "隨張騫出使 (需體力50)", nextId: "han_war", reqHealth: 50, effect: { health: -30, reputation: 40, wealth: 30, knowledge: 20 }, feedback: "你帶回了葡萄、苜蓿，開闢了絲綢之路！", historyNote: "張騫出使西域雖然沒達成軍事目的，但打通了中西交通，促進了絲綢之路的繁榮。" },
-                    { text: "留守長安繪製地圖", nextId: "han_war", effect: { knowledge: 20, wealth: 10, reputation: 5 }, feedback: "你整理了西域的地理情報。", historyNote: "漢朝隨後在西域設立了「西域都護府」，正式將西域納入版圖。" },
-                    { text: "投資絲綢貿易", nextId: "han_war", reqWealth: 30, effect: { wealth: 50 }, feedback: "你成為了絲路上的大商人。", historyNote: "中國的絲綢通過這條道路傳到了羅馬，西方因此稱中國為『絲國』(Seres)。" }
-                ]
-            },
-            // 14. 征討匈奴
-            "han_war": {
-                id: "han_war",
-                title: "14. 漠北決戰 (BC 119)",
-                text: "衛青、霍去病率大軍深入漠北。這是漢匈戰爭最高潮。",
-                image: "War",
-                options: [
-                    { text: "追隨霍去病封狼居胥 (需體力60)", nextId: "han_su_wu", reqHealth: 60, effect: { reputation: 50, health: -40, wealth: 20, knowledge: 10 }, feedback: "匈奴遠遁，漠南無王庭！你成為了一代名將。", historyNote: "霍去病年少成名，封狼居胥山，是武將的最高榮譽。漢軍大勝，匈奴遠遁。" },
-                    { text: "擔任後勤運糧", nextId: "han_su_wu", effect: { health: -10, wealth: 10, reputation: 5 }, feedback: "兵馬未動，糧草先行。", historyNote: "漢武帝連年征戰，雖然武功極盛，但也導致「海內虛耗，戶口減半」。" },
-                    { text: "畏戰逃跑", nextId: "han_su_wu", effect: { reputation: -30, health: 5 }, feedback: "你保住了性命，但成了逃兵。", historyNote: "漢律對逃兵懲罰極嚴，往往會累及家人。" }
-                ]
-            },
-            // 15. 蘇武牧羊
-            "han_su_wu": {
-                id: "han_su_wu",
-                title: "15. 蘇武牧羊 (BC 100)",
-                text: "蘇武出使匈奴被扣留，流放北海牧羊十九年，持節不屈。",
-                image: "Desert",
-                options: [
-                    { text: "設法為蘇武送去食物 (需財富30)", nextId: "han_sima", reqWealth: 30, effect: { wealth: -20, reputation: 30 }, feedback: "你的義舉讓蘇武得以堅持下去。", historyNote: "蘇武在北海（今貝加爾湖）挖野鼠洞、吃草根，堅持漢節不降，成為忠君愛國的典範。" },
-                    { text: "勸說匈奴單于放人 (需智力50)", nextId: "han_sima", reqKnowledge: 50, effect: { knowledge: 10, reputation: 20 }, feedback: "雖然單于未完全答應，但改善了漢使待遇。", historyNote: "直到漢昭帝時期，漢匈和親，蘇武才得以獲釋回國。" },
-                    { text: "感嘆忠義，自行離去", nextId: "han_sima", effect: { knowledge: 5 }, feedback: "你見證了何為氣節。", historyNote: "李陵勸降蘇武失敗，羞愧離去。兩人的選擇成為千古話題。" }
-                ]
-            },
-            // 16. 司馬遷寫史記
-            "han_sima": {
-                id: "han_sima",
-                title: "16. 史家絕唱 (BC 99)",
-                text: "【司馬遷】因李陵案下獄，面臨生死抉擇。",
-                image: "Prison",
-                options: [
-                    { text: "傾家蕩產為司馬遷贖罪 (需財富80)", nextId: "han_zhaojun", reqWealth: 80, effect: { wealth: -80, reputation: 30, knowledge: 10 }, feedback: "你的義舉震驚朝野，雖未救出，但情義千古。", historyNote: "漢律規定可以用錢贖死罪，但司馬遷家貧且無人相助，最終選擇接受宮刑以完成史記。" },
-                    { text: "獄中探望，鼓勵著書", nextId: "han_zhaojun", effect: { knowledge: 30, reputation: 10 }, feedback: "《史記》得以完成，你見證了歷史的誕生。", historyNote: "司馬遷發憤著書，寫成《史記》，被魯迅譽為「史家之絕唱，無韻之離騷」。" },
-                    { text: "避之唯恐不及", nextId: "han_zhaojun", effect: { reputation: -10 }, feedback: "你選擇了冷漠。", historyNote: "在專制皇權下，大臣們往往明哲保身，不敢為同僚說話。" }
-                ]
-            },
-            // 17. 昭君出塞
-            "han_zhaojun": {
-                id: "han_zhaojun",
-                title: "17. 昭君出塞 (BC 33)",
-                text: "漢元帝時期，呼韓邪單于來朝求親。宮女王昭君主動請纓出塞和親。",
-                image: "Desert",
-                options: [
-                    { text: "護送昭君出塞 (需體力30)", nextId: "wang_mang", reqHealth: 30, effect: { health: -20, reputation: 20, wealth: 20, knowledge: 10 }, feedback: "邊疆維持了半個世紀的和平，你一路護送有功。", historyNote: "昭君出塞為漢匈帶來了60年的和平，是民族融合的佳話。" },
-                    { text: "揭發畫師毛延壽", nextId: "wang_mang", effect: { reputation: 15, wealth: 10 }, feedback: "毛延壽伏法，但昭君已遠去。", historyNote: "傳說畫師索賄不成故意畫醜昭君。漢元帝見昭君美貌後悔不已，殺了毛延壽。" },
-                    { text: "感嘆紅顏薄命", nextId: "wang_mang", effect: { knowledge: 5 }, feedback: "你寫下了一首送別詩。", historyNote: "昭君出塞的故事成為後世無數詩詞戲曲的題材。" }
-                ]
-            },
-            // 18. 王莽改制
-            "wang_mang": {
-                id: "wang_mang",
-                title: "18. 王莽新朝 (AD 9)",
-                text: "王莽篡漢，建立新朝，推行「王田制」與幣制改革，天下大亂。",
-                image: "Treasury",
-                options: [
-                    { text: "預見幣制崩潰，囤積黃金 (需智力40)", nextId: "han_guangwu", reqKnowledge: 40, effect: { knowledge: 20, wealth: 30 }, feedback: "你的經濟頭腦讓你在亂世中保全了資產。", historyNote: "王莽四次改革幣制，貨幣種類繁雜，導致經濟崩潰，百姓破產。" },
-                    { text: "加入綠林赤眉起義", nextId: "han_guangwu", effect: { health: -20, reputation: 20, wealth: 10 }, feedback: "新朝滅亡，光武中興。", historyNote: "王莽改制雖然立意良好（如廢除奴隸），但脫離現實，最終被綠林、赤眉起義軍推翻。" },
-                    { text: "盡忠王莽，支持改革", nextId: "han_guangwu", effect: { wealth: -20, reputation: -20 }, feedback: "你隨新朝一同覆滅。", historyNote: "王莽被歷史學家稱為『穿越者』，他的很多政策太過超前或復古，不合時宜。" }
-                ]
-            },
-            // 19. 光武中興
-            "han_guangwu": {
-                id: "han_guangwu",
-                title: "19. 光武中興 (AD 25)",
-                text: "劉秀建立東漢，定都洛陽。實行「柔道」治國，釋放奴婢，退功臣。",
-                image: "QinPalace",
-                options: [
-                    { text: "投奔劉秀，成為功臣 (需聲望30)", nextId: "han_ban_chao", reqReputation: 30, effect: { reputation: 30, wealth: 40, health: -10, knowledge: 10 }, feedback: "柔道治國，天下重歸一統。", historyNote: "光武帝劉秀推行「柔道」治國，釋放奴婢，退功臣進文吏，開創了「光武中興」。" },
-                    { text: "解甲歸田，安心種地", nextId: "han_ban_chao", effect: { health: 20, wealth: 10 }, feedback: "享受久違的和平。", historyNote: "東漢初期社會經濟迅速恢復，人口大幅增長。" },
-                    { text: "割據一方，對抗漢軍", nextId: "han_ban_chao", effect: { health: -30, reputation: -20 }, feedback: "你被漢軍擊敗，流亡海外。", historyNote: "劉秀用了十幾年時間才徹底消滅各地的割據勢力。" }
-                ]
-            },
-            // 20. 投筆從戎
-            "han_ban_chao": {
-                id: "han_ban_chao",
-                title: "20. 投筆從戎 (AD 73)",
-                text: "班超不願只是抄寫文書，決定放下毛筆，出使西域，重振漢朝聲威。",
-                image: "Desert",
-                options: [
-                    { text: "效法班超，出使西域", nextId: "east_han_politics", effect: { knowledge: 10, reputation: 20, health: -10, wealth: 10 }, feedback: "不入虎穴，焉得虎子！", historyNote: "班超經營西域三十年，僅靠少量兵力就收服了西域五十多國，重新打通絲綢之路。" },
-                    { text: "繼續做文書工作", nextId: "east_han_politics", effect: { knowledge: 5, wealth: 10, health: 5 }, feedback: "平穩一生，但略顯平庸。", historyNote: "東漢中期以後，文官集團逐漸形成，與後來的外戚、宦官形成政治角力。" },
-                    { text: "經商致富", nextId: "east_han_politics", effect: { wealth: 20, reputation: 0 }, feedback: "你成為了絲路富商。", historyNote: "東漢時期，洛陽商業繁榮，絲綢之路貿易興盛。" }
-                ]
-            },
-            // 21. 外戚與宦官
-            "east_han_politics": {
-                id: "east_han_politics",
-                title: "21. 外戚與宦官 (AD 100+)",
-                text: "東漢中期以後，皇帝年幼，太后臨朝，外戚專權。皇帝長大後往往依靠宦官奪權。",
-                image: "Crown",
-                options: [
-                    { text: "依附外戚竇氏", nextId: "han_tech", effect: { wealth: 30, reputation: -10, health: -10 }, feedback: "權傾一時，但好景不長。", historyNote: "外戚竇憲雖然擊敗匈奴勒石燕然，但因專權最終被漢和帝聯合宦官誅殺。" },
-                    { text: "結交清流名士 (需智力50)", nextId: "han_tech", reqKnowledge: 50, effect: { reputation: 20, knowledge: 10 }, feedback: "保持氣節，受人尊敬。", historyNote: "士大夫階層（清流）抨擊時政，反對宦官專權，導致了後來的黨錮之禍。" },
-                    { text: "遠離朝堂，明哲保身", nextId: "han_tech", effect: { health: 10 }, feedback: "眼不見為淨。", historyNote: "東漢末年政治黑暗，許多知識分子選擇隱居不仕。" }
-                ]
-            },
-            // 22. 東漢科技
-            "han_tech": {
-                id: "han_tech",
-                title: "22. 科技巔峰 (AD 105)",
-                text: "東漢時期，蔡倫改進造紙術，張衡發明地動儀。",
-                image: "Study",
-                options: [
-                    { text: "投資造紙術推廣 (需財富40)", nextId: "han_disaster", reqWealth: 40, effect: { knowledge: 30, reputation: 20, wealth: -20 }, feedback: "文明因紙張而傳承，你功不可沒。", historyNote: "蔡倫用樹皮、麻頭等廉價原料造紙（蔡侯紙），使紙張取代簡牘成為主要書寫材料。" },
-                    { text: "與張衡觀測星象", nextId: "han_disaster", effect: { knowledge: 40, health: 10, reputation: 10 }, feedback: "你洞悉了宇宙的奧秘。", historyNote: "張衡不僅發明了候風地動儀，還提出了『渾天說』，是東漢最偉大的科學家。" },
-                    { text: "研究醫學 (華佗/張仲景)", nextId: "han_disaster", effect: { health: 20, reputation: 10 }, feedback: "懸壺濟世，救人無數。", historyNote: "東漢末年出現了『醫聖』張仲景（傷寒雜病論）和神醫華佗（麻沸散）。" }
-                ]
-            },
-            // 23. 黨錮之禍
-            "han_disaster": {
-                id: "han_disaster",
-                title: "23. 黨錮之禍 (AD 166)",
-                text: "宦官專權，打壓士大夫。朝廷下令逮捕「黨人」，政治極度黑暗。",
-                image: "Prison",
-                options: [
-                    { text: "營救被迫害的名士 (需體力30)", nextId: "yellow_turban", reqHealth: 30, effect: { reputation: 40, health: -30, wealth: -20, knowledge: 10 }, feedback: "極度危險，但你贏得了天下的敬重。", historyNote: "范滂等名士寧死不屈，展現了士大夫的氣節。黨錮之禍動搖了東漢的統治根基。" },
-                    { text: "依附宦官以求自保", nextId: "yellow_turban", effect: { wealth: 50, reputation: -50 }, feedback: "你保全了性命，卻失去了名聲。", historyNote: "當時民間有諺語：『舉秀才，不知書；舉孝廉，父別居』，諷刺選官制度的腐敗。" },
-                    { text: "隱居山林", nextId: "yellow_turban", effect: { knowledge: 10, health: 10, wealth: -10 }, feedback: "避世不出，等待時機。", historyNote: "亂世之中，許多人選擇明哲保身。" }
-                ]
-            },
-            // 24. 黃巾起義
-            "yellow_turban": {
-                id: "yellow_turban",
-                title: "24. 黃巾起義 (AD 184)",
-                text: "「蒼天已死，黃天當立！」張角率領農民起義，天下大亂。",
-                image: "War",
-                options: [
-                    { text: "組織義兵，保衛家園 (需聲望50)", nextId: "dong_zhuo", reqReputation: 50, effect: { reputation: 30, health: -20, wealth: 10, knowledge: 10 }, feedback: "你成為了一方豪強。", historyNote: "為了鎮壓黃巾軍，朝廷下放軍權給地方州牧，導致了後來的軍閥割據。" },
-                    { text: "加入黃巾軍", nextId: "dong_zhuo", effect: { health: -10, wealth: 20, reputation: -10 }, feedback: "搶糧搶錢，但最終被鎮壓。", historyNote: "黃巾起義是中國歷史上規模最大的以宗教形式組織的農民起義，沉重打擊了東漢統治。" },
-                    { text: "攜家帶眷逃難", nextId: "dong_zhuo", effect: { health: -20, wealth: -20 }, feedback: "流離失所，苦不堪言。", historyNote: "戰亂導致人口銳減，『白骨露於野，千里無雞鳴』。" }
-                ]
-            },
-            // 25. 董卓亂政
-            "dong_zhuo": {
-                id: "dong_zhuo",
-                title: "25. 董卓亂政 (AD 189)",
-                text: "董卓進京，廢少帝，立獻帝，火燒洛陽。這是歷史旅程的終點。",
-                image: "Fire",
-                options: [
-                    { text: "參加十八路諸侯討董", nextId: "ending_calc", reqHealth: 50, effect: { reputation: 40, health: -30 }, feedback: "雖然聯軍失敗，但你展現了忠義。", historyNote: "討董聯盟因各懷鬼胎而解散，開啟了三國軍閥混戰。" },
-                    { text: "保護百姓撤離洛陽", nextId: "ending_calc", effect: { reputation: 30, wealth: -10 }, feedback: "你救人無數，功德無量。", historyNote: "董卓強迫百萬人口西遷長安，沿途死傷無數，洛陽化為焦土。" },
-                    { text: "冷眼旁觀，保存實力", nextId: "ending_calc", effect: { wealth: 20 }, feedback: "你保存了實力，準備在亂世中分一杯羹。", historyNote: "亂世中，實力才是硬道理。" }
-                ]
-            },
+            "intro": { id: "intro", title: "序章：歷史的召喚", text: "西元2024年。歷史課上，老師講述著：「秦皇漢武，略輸文采...」你的思緒飄向了兩千年前的時空漩渦。", image: "Classroom", options: [{ text: "認真聽課", nextId: "qin_war", effect: { knowledge: 10 }, feedback: "知識就是力量。", historyNote: "歷史學習能幫助我們以古鑑今。" }, { text: "睡覺儲存體力", nextId: "qin_war", effect: { health: 10 }, feedback: "精神飽滿地穿越了。", historyNote: "穿越故事往往始於意外。" }, { text: "偷看課外書", nextId: "qin_war", effect: { wealth: 5, reputation: -5 }, feedback: "獲得了一些雜學。", historyNote: "古代也有閒書。" }] },
+            "qin_war": { id: "qin_war", title: "1. 秦滅六國 (BC 230-221)", text: "你置身於秦軍大帳。秦王嬴政欲一統天下，滅國之戰一觸即發。", image: "War", options: [{ text: "獻計「遠交近攻」", nextId: "qin_system", reqKnowledge: 15, effect: { knowledge: 15, reputation: 10, health: -5, wealth: 10 }, feedback: "策略被採納！", historyNote: "范雎提出的戰略。" }, { text: "親上前線殺敵", nextId: "qin_system", effect: { health: -10, wealth: 20, reputation: 5 }, feedback: "獲得軍功爵位。", historyNote: "秦國實行軍功爵制。" }, { text: "擔任軍需官", nextId: "qin_system", reqWealth: 10, effect: { wealth: 30, reputation: -5 }, feedback: "確保糧草充足。", historyNote: "秦國農業發達。" }] },
+            "qin_system": { id: "qin_system", title: "2. 制度確立 (BC 221)", text: "朝廷爭論實行「郡縣制」還是「分封制」。", image: "QinPalace", options: [{ text: "支持李斯(郡縣)", nextId: "qin_standard", effect: { knowledge: 20, reputation: 10 }, feedback: "中央集權確立！", historyNote: "李斯反對分封。" }, { text: "支持王綰(分封)", nextId: "qin_standard", reqReputation: 10, effect: { reputation: -10, health: -5 }, feedback: "建議被駁回。", historyNote: "王綰認為邊遠難治。" }, { text: "提出折中方案", nextId: "qin_standard", reqKnowledge: 20, effect: { knowledge: 10, reputation: 5 }, feedback: "展現了智慧。", historyNote: "後來的郡國並行制。" }] },
+            "qin_standard": { id: "qin_standard", title: "3. 統一度量衡", text: "秦始皇下令統一度量衡與文字。", image: "Treasury", options: [{ text: "推廣小篆", nextId: "qin_construction", reqKnowledge: 30, effect: { knowledge: 15, reputation: 10, wealth: 10 }, feedback: "文化傳承。", historyNote: "書同文。" }, { text: "兌換秦半兩", nextId: "qin_construction", effect: { wealth: 20 }, feedback: "資產保值。", historyNote: "統一貨幣。" }, { text: "私藏舊幣", nextId: "qin_construction", effect: { knowledge: -10, health: -20 }, feedback: "因抗法受傷。", historyNote: "舊標準失效。" }] },
+            "qin_construction": { id: "qin_construction", title: "4. 大興土木", text: "修築長城與阿房宮。", image: "GreatWall", options: [{ text: "參與修長城", nextId: "qin_law", reqHealth: 30, effect: { health: -30, reputation: 20, wealth: 10 }, feedback: "守護邊疆。", historyNote: "孟姜女哭長城。" }, { text: "捐資免役", nextId: "qin_law", reqWealth: 40, effect: { wealth: -40, health: 10, reputation: -5 }, feedback: "躲過苦役。", historyNote: "以貲贖罪。" }, { text: "逃避勞役", nextId: "qin_law", effect: { health: -50, wealth: -20, reputation: -10 }, feedback: "被抓受罰。", historyNote: "秦法嚴苛。" }] },
+            "qin_law": { id: "qin_law", title: "5. 嚴刑峻法", text: "連坐法實施中。", image: "Prison", options: [{ text: "舉報鄰居", nextId: "qin_burn", effect: { wealth: 30, reputation: -20 }, feedback: "獲賞失人心。", historyNote: "什伍連坐。" }, { text: "幫助隱瞞", nextId: "qin_burn", effect: { reputation: 20, health: -20 }, feedback: "保住鄰居。", historyNote: "儒家親親相隱。" }, { text: "鑽研秦律", nextId: "qin_burn", effect: { knowledge: 20, reputation: -10 }, feedback: "成為刀筆吏。", historyNote: "以吏為師。" }] },
+            "qin_burn": { id: "qin_burn", title: "6. 焚書坑儒", text: "咸陽城火光沖天。", image: "Fire", options: [{ text: "冒死藏書", nextId: "qin_end", reqHealth: 20, effect: { reputation: 30, health: -20, knowledge: 10 }, feedback: "保存火種。", historyNote: "文化浩劫。" }, { text: "交出藏書", nextId: "qin_end", effect: { reputation: -10, knowledge: -5 }, feedback: "選擇生存。", historyNote: "典籍失傳。" }, { text: "冷眼旁觀", nextId: "qin_end", effect: { health: 5 }, feedback: "明哲保身。", historyNote: "知識分子失望。" }] },
+            "qin_end": { id: "qin_end", title: "7. 秦朝滅亡", text: "天下大亂，劉邦兵臨咸陽。", image: "War", options: [{ text: "投靠劉邦", nextId: "han_early", effect: { knowledge: 10, reputation: 10, wealth: 10 }, feedback: "約法三章。", historyNote: "得民心者得天下。" }, { text: "投靠項羽", nextId: "han_early", effect: { health: 10, wealth: 10, reputation: -5 }, feedback: "火燒阿房宮。", historyNote: "項羽失民心。" }, { text: "逃回鄉里", nextId: "han_early", effect: { health: 5, wealth: -5 }, feedback: "保全性命。", historyNote: "戰亂人口銳減。" }] },
+            "han_early": { id: "han_early", title: "8. 漢初休養", text: "黃老之術，無為而治。", image: "Farm", options: [{ text: "歸鄉耕田", nextId: "han_wenjing", effect: { health: 10, wealth: 20, reputation: 5 }, feedback: "輕徭薄賦。", historyNote: "休養生息。" }, { text: "研讀道家", nextId: "han_wenjing", effect: { knowledge: 20, reputation: 5 }, feedback: "清靜無為。", historyNote: "漢初主流思想。" }, { text: "協助官府", nextId: "han_wenjing", effect: { prestige: 10, wealth: 5 }, feedback: "蕭規曹隨。", historyNote: "政治清明。" }] },
+            "han_wenjing": { id: "han_wenjing", title: "9. 文景之治", text: "百姓富庶。", image: "Treasury", options: [{ text: "大力經商", nextId: "han_seven_states", effect: { wealth: 50, knowledge: 5 }, feedback: "成為富商。", historyNote: "商業繁榮。" }, { text: "興辦私學", nextId: "han_seven_states", effect: { knowledge: 20, reputation: 20, wealth: -10 }, feedback: "桃李滿天下。", historyNote: "文化復甦。" }, { text: "享受盛世", nextId: "han_seven_states", effect: { health: 20, wealth: -20 }, feedback: "快樂時光。", historyNote: "刑罰減輕。" }] },
+            "han_seven_states": { id: "han_seven_states", title: "10. 七國之亂", text: "七國造反。", image: "War", options: [{ text: "投軍平叛", nextId: "han_wu_ideology", reqReputation: 20, effect: { reputation: 30, health: -20, wealth: 20 }, feedback: "立下戰功。", historyNote: "周亞夫平叛。" }, { text: "捐資助軍", nextId: "han_wu_ideology", effect: { wealth: -30, reputation: 10 }, feedback: "財富助國。", historyNote: "晁錯被殺。" }, { text: "躲避戰亂", nextId: "han_wu_ideology", effect: { health: 5, wealth: -10, reputation: -5 }, feedback: "錯失良機。", historyNote: "諸侯削權。" }] },
+            "han_wu_ideology": { id: "han_wu_ideology", title: "11. 獨尊儒術", text: "漢武帝罷黜百家。", image: "Study", options: [{ text: "攻讀五經", nextId: "han_wu_eco", reqKnowledge: 30, effect: { knowledge: 30, reputation: 10, health: -5 }, feedback: "天子門生。", historyNote: "太學建立。" }, { text: "堅持黃老", nextId: "han_wu_eco", effect: { reputation: -10, knowledge: 5 }, feedback: "仕途受阻。", historyNote: "思想不合時宜。" }, { text: "鑽研法家", nextId: "han_wu_eco", effect: { reputation: 5, knowledge: 10, wealth: 10 }, feedback: "儒表法裡。", historyNote: "重用酷吏。" }] },
+            "han_wu_eco": { id: "han_wu_eco", title: "12. 鹽鐵官營", text: "桑弘羊推行官營。", image: "Treasury", options: [{ text: "支持官營", nextId: "han_zhang_qian", effect: { reputation: 10, wealth: 20, knowledge: 10 }, feedback: "國庫充盈。", historyNote: "增加財政收入。" }, { text: "反對官營", nextId: "han_zhang_qian", effect: { reputation: 20, wealth: -10, knowledge: 10 }, feedback: "贏得尊重。", historyNote: "鹽鐵會議。" }, { text: "私下倒賣", nextId: "han_zhang_qian", effect: { wealth: 40, health: -10 }, feedback: "富可敵國。", historyNote: "風險極大。" }] },
+            "han_zhang_qian": { id: "han_zhang_qian", title: "13. 鑿空西域", text: "張騫出使。", image: "Desert", options: [{ text: "隨張騫出使", nextId: "han_war", reqHealth: 50, effect: { health: -30, reputation: 40, wealth: 30, knowledge: 20 }, feedback: "絲路開通。", historyNote: "中西交流。" }, { text: "留守繪圖", nextId: "han_war", effect: { knowledge: 20, wealth: 10, reputation: 5 }, feedback: "整理情報。", historyNote: "西域都護府。" }, { text: "投資貿易", nextId: "han_war", reqWealth: 30, effect: { wealth: 50 }, feedback: "絲路商人。", historyNote: "絲綢外銷。" }] },
+            "han_war": { id: "han_war", title: "14. 漠北決戰", text: "衛青霍去病北伐。", image: "War", options: [{ text: "追隨霍去病", nextId: "han_sima", reqHealth: 60, effect: { reputation: 50, health: -40, wealth: 20 }, feedback: "封狼居胥。", historyNote: "匈奴遠遁。" }, { text: "擔任後勤", nextId: "han_sima", effect: { health: -10, wealth: 10, reputation: 5 }, feedback: "糧草先行。", historyNote: "國力消耗。" }, { text: "畏戰逃跑", nextId: "han_sima", effect: { reputation: -30, health: 5 }, feedback: "成為逃兵。", historyNote: "漢律嚴懲。" }] },
+            "han_sima": { id: "han_sima", title: "15. 蘇武牧羊", text: "蘇武北海牧羊。", image: "Desert", options: [{ text: "送去食物", nextId: "han_zhaojun", reqWealth: 30, effect: { wealth: -20, reputation: 30 }, feedback: "雪中送炭。", historyNote: "持節不屈。" }, { text: "勸說單于", nextId: "han_zhaojun", reqKnowledge: 50, effect: { knowledge: 10, reputation: 20 }, feedback: "改善待遇。", historyNote: "漢匈關係。" }, { text: "感嘆忠義", nextId: "han_zhaojun", effect: { knowledge: 5 }, feedback: "見證氣節。", historyNote: "李陵羞愧。" }] },
+            "han_zhaojun": { id: "han_zhaojun", title: "16. 史家絕唱", text: "司馬遷下獄。", image: "Prison", options: [{ text: "出資贖罪", nextId: "wang_mang", reqWealth: 80, effect: { wealth: -80, reputation: 30, knowledge: 10 }, feedback: "情義無價。", historyNote: "贖死罪。" }, { text: "鼓勵著書", nextId: "wang_mang", effect: { knowledge: 30, reputation: 10 }, feedback: "史記完成。", historyNote: "無韻離騷。" }, { text: "避之不及", nextId: "wang_mang", effect: { reputation: -10 }, feedback: "冷漠以對。", historyNote: "明哲保身。" }] },
+            "wang_mang": { id: "wang_mang", title: "17. 昭君出塞", text: "王昭君和親。", image: "Desert", options: [{ text: "護送昭君", nextId: "han_guangwu", reqHealth: 30, effect: { health: -20, reputation: 20, wealth: 20, knowledge: 10 }, feedback: "邊疆和平。", historyNote: "民族融合。" }, { text: "揭發畫師", nextId: "han_guangwu", effect: { reputation: 15, wealth: 10 }, feedback: "毛延壽伏法。", historyNote: "畫師索賄。" }, { text: "感嘆紅顏", nextId: "han_guangwu", effect: { knowledge: 5 }, feedback: "寫下詩篇。", historyNote: "後世題材。" }] },
+            "han_guangwu": { id: "han_guangwu", title: "18. 王莽新朝", text: "王莽改制。", image: "Treasury", options: [{ text: "囤積黃金", nextId: "han_ban_chao", reqKnowledge: 40, effect: { knowledge: 20, wealth: 30 }, feedback: "躲過破產。", historyNote: "幣制混亂。" }, { text: "加入綠林", nextId: "han_ban_chao", effect: { health: -20, reputation: 20, wealth: 10 }, feedback: "推翻新朝。", historyNote: "赤眉起義。" }, { text: "盡忠王莽", nextId: "han_ban_chao", effect: { wealth: -20, reputation: -20 }, feedback: "隨朝覆滅。", historyNote: "改革失敗。" }] },
+            "han_ban_chao": { id: "han_ban_chao", title: "19. 光武中興", text: "劉秀建立東漢。", image: "QinPalace", options: [{ text: "投奔劉秀", nextId: "east_han_politics", reqReputation: 30, effect: { reputation: 30, wealth: 40, health: -10 }, feedback: "天下歸一。", historyNote: "柔道治國。" }, { text: "解甲歸田", nextId: "east_han_politics", effect: { health: 20, wealth: 10 }, feedback: "享受和平。", historyNote: "經濟恢復。" }, { text: "割據一方", nextId: "east_han_politics", effect: { health: -30, reputation: -20 }, feedback: "被擊敗流亡。", historyNote: "消滅割據。" }] },
+            "east_han_politics": { id: "east_han_politics", title: "20. 投筆從戎", text: "班超通西域。", image: "Desert", options: [{ text: "效法班超", nextId: "han_tech", effect: { knowledge: 10, reputation: 20, health: -10 }, feedback: "威震西域。", historyNote: "經營西域。" }, { text: "繼續文書", nextId: "han_tech", effect: { knowledge: 5, wealth: 10 }, feedback: "平穩一生。", historyNote: "文官系統。" }, { text: "經商致富", nextId: "han_tech", effect: { wealth: 20, reputation: 0 }, feedback: "絲路富商。", historyNote: "貿易興盛。" }] },
+            "han_tech": { id: "han_tech", title: "21. 外戚宦官", text: "政治黑暗。", image: "QinPalace", options: [{ text: "依附外戚", nextId: "han_disaster", effect: { wealth: 30, reputation: -10, health: -10 }, feedback: "權傾一時。", historyNote: "外戚專權。" }, { text: "結交清流", nextId: "han_disaster", reqKnowledge: 50, effect: { reputation: 20, knowledge: 10 }, feedback: "保持氣節。", historyNote: "士大夫抗爭。" }, { text: "遠離朝堂", nextId: "han_disaster", effect: { health: 10 }, feedback: "明哲保身。", historyNote: "隱士增多。" }] },
+            "han_disaster": { id: "han_disaster", title: "22. 科技巔峰", text: "蔡倫與張衡。", image: "Study", options: [{ text: "投資造紙", nextId: "yellow_turban", reqWealth: 40, effect: { knowledge: 30, reputation: 20, wealth: -20 }, feedback: "文明傳承。", historyNote: "蔡侯紙。" }, { text: "研究天文", nextId: "yellow_turban", effect: { knowledge: 40, health: 10 }, feedback: "洞悉宇宙。", historyNote: "渾天儀。" }, { text: "研究醫學", nextId: "yellow_turban", effect: { health: 20, reputation: 10 }, feedback: "懸壺濟世。", historyNote: "傷寒雜病論。" }] },
+            "yellow_turban": { id: "yellow_turban", title: "23. 黨錮之禍", text: "迫害黨人。", image: "Prison", options: [{ text: "營救名士", nextId: "dong_zhuo", reqHealth: 30, effect: { reputation: 40, health: -30, wealth: -20 }, feedback: "贏得敬重。", historyNote: "士大夫受創。" }, { text: "依附宦官", nextId: "dong_zhuo", effect: { wealth: 50, reputation: -50 }, feedback: "失去名聲。", historyNote: "選官腐敗。" }, { text: "隱居山林", nextId: "dong_zhuo", effect: { knowledge: 10, health: 10 }, feedback: "避世不出。", historyNote: "亂世徵兆。" }] },
+            "dong_zhuo": { id: "dong_zhuo", title: "24. 黃巾起義", text: "蒼天已死。", image: "War", options: [{ text: "組織義兵", nextId: "final_chaos", reqReputation: 50, effect: { reputation: 30, health: -20, wealth: 10 }, feedback: "成為豪強。", historyNote: "軍閥崛起。" }, { text: "加入黃巾", nextId: "final_chaos", effect: { health: -10, wealth: 20, reputation: -10 }, feedback: "最終被鎮壓。", historyNote: "東漢瓦解。" }, { text: "攜家逃難", nextId: "final_chaos", effect: { health: -20, wealth: -20 }, feedback: "流離失所。", historyNote: "人口銳減。" }] },
+            "final_chaos": { id: "final_chaos", title: "25. 董卓亂政", text: "火燒洛陽。", image: "Fire", options: [{ text: "討伐董卓", nextId: "ending_calc", reqHealth: 50, effect: { reputation: 40, health: -30 }, feedback: "展現忠義。", historyNote: "聯軍解散。" }, { text: "保護百姓", nextId: "ending_calc", effect: { reputation: 30, wealth: -10 }, feedback: "萬家生佛。", historyNote: "西遷長安。" }, { text: "冷眼旁觀", nextId: "ending_calc", effect: { wealth: 20 }, feedback: "保存實力。", historyNote: "三國序幕。" }] },
 
-            // 結局計算與展示
-            "ending_calc": { id: "ending_calc", title: "結算中...", text: "正在統計你的歷史評價...", isCalc: true, image: "Classroom" },
-            
-            // 九大結局
-            "ending_emperor": { id: "ending_emperor", title: "結局：千古一帝", text: "你的綜合能力達到了頂峰！你像秦皇漢武一樣，在亂世中建立了自己的霸業，名垂青史。", image: "QinPalace" },
-            "ending_general": { id: "ending_general", title: "結局：亂世名將", text: "你勇冠三軍，聲名遠播。你就像衛青、霍去病一樣，是國家最堅實的盾牌。", image: "War" },
-            "ending_scholar": { id: "ending_scholar", title: "結局：一代宗師", text: "你博古通今，學富五車。你傳承了文明的火種，像司馬遷、董仲舒一樣影響了後世。", image: "Study" },
-            "ending_rich": { id: "ending_rich", title: "結局：富甲一方", text: "你掌握了經濟命脈，富可敵國。在亂世中，財富也是一種強大的力量。", image: "Treasury" },
-            "ending_official": { id: "ending_official", title: "結局：權傾朝野", text: "你長袖善舞，權謀過人。雖然名聲不佳，但你掌握了實權，成為了一代權臣。", image: "QinPalace" },
-            "ending_doctor": { id: "ending_doctor", title: "結局：懸壺濟世", text: "你精通醫術，救死扶傷。雖然不問政治，但百姓為你立生祠，稱你為醫聖。", image: "Study" },
-            "ending_exile": { id: "ending_exile", title: "結局：流亡海外", text: "你帶著財富遠走高飛，避開了中原的戰亂，在海外開枝散葉。", image: "Desert" },
-            "ending_martyr": { id: "ending_martyr", title: "結局：起義烈士", text: "你為了理想而戰，雖然失敗身死，但你的精神激勵了後來者。", image: "Fire" },
-            "ending_commoner": { id: "ending_commoner", title: "結局：歸隱田園", text: "你平安度過了波瀾壯闊的秦漢四百年，選擇歸隱田園。雖然史書無名，但這也是一種幸福。", image: "Farm" },
-            
-            "game_over": { id: "game_over", title: "壯志未酬", text: "很遺憾，你的體力耗盡，倒在了歷史的長河中...", image: "Fire" }
+            // 結局計算
+            "ending_calc": { id: "ending_calc", title: "結算中...", text: "...", isCalc: true, image: "Classroom" },
+            "ending_emperor": { id: "ending_emperor", title: "結局：千古一帝", text: "你文治武功，富甲天下，成為了歷史的傳奇。", image: "QinPalace" },
+            "ending_general": { id: "ending_general", title: "結局：亂世名將", text: "你勇冠三軍，聲名遠播，是時代的守護者。", image: "War" },
+            "ending_scholar": { id: "ending_scholar", title: "結局：一代宗師", text: "你博古通今，傳承了文明的火種。", image: "Study" },
+            "ending_rich": { id: "ending_rich", title: "結局：富甲一方", text: "你掌握了經濟命脈，富可敵國。", image: "Treasury" },
+            "ending_official": { id: "ending_official", title: "結局：權傾朝野", text: "你長袖善舞，權謀過人，成為一代權臣。", image: "QinPalace" },
+            "ending_doctor": { id: "ending_doctor", title: "結局：懸壺濟世", text: "你精通醫術，救死扶傷，被尊為醫聖。", image: "Study" },
+            "ending_exile": { id: "ending_exile", title: "結局：流亡海外", text: "你帶著財富遠走高飛，在海外開枝散葉。", image: "Desert" },
+            "ending_martyr": { id: "ending_martyr", title: "結局：起義烈士", text: "你為了理想而戰，雖然犧牲，但精神永存。", image: "Fire" },
+            "ending_commoner": { id: "ending_commoner", title: "結局：歸隱田園", text: "你平安度過亂世，見證了歷史的興衰。", image: "Farm" },
+            "game_over": { id: "game_over", title: "壯志未酬", text: "你倒在了歷史的長河中...", image: "Fire" }
         };
 
-        // --- 顯示組件 ---
+        // 隨機事件
+        const randomEvents = [
+            { name: "李斯", role: "秦朝丞相", question: "吾提議廢分封，行郡縣。你可知秦朝將天下分為多少郡？", options: ["十二郡", "三十六郡", "四十八郡", "八十一郡"], answer: 1, correctMsg: "然也！集權中央。", wrongMsg: "謬矣！", reward: { knowledge: 10, prestige: 5 }, penalty: { knowledge: -5 } },
+            { npc: "荊軻", role: "燕國刺客", question: "風蕭蕭兮易水寒... 下一句為何？", options: ["壯士一去兮不復還", "大風起兮雲飛揚", "力拔山兮氣蓋世", "此恨綿綿無絕期"], answer: 0, correctMsg: "懂我者，壯士也！", wrongMsg: "不懂風雅。", reward: { health: 10, reputation: 5 }, penalty: { reputation: -5 } },
+            { npc: "韓信", role: "大將軍", question: "吾背水一戰擊敗趙軍。此戰發生在何處？", options: ["鉅鹿", "井陘", "垓下", "官渡"], answer: 1, correctMsg: "兵法之道，存乎一心。", wrongMsg: "錯了。", reward: { reputation: 15 }, penalty: { health: -10 } },
+            { npc: "張騫", role: "博望侯", question: "吾出使西域，是為了聯合誰夾擊匈奴？", options: ["大宛", "烏孫", "大月氏", "樓蘭"], answer: 2, correctMsg: "正是！", wrongMsg: "非也。", reward: { knowledge: 10, wealth: 10 }, penalty: { wealth: -5 } },
+            { npc: "司馬遷", role: "太史令", question: "吾寫《史記》，誓要「究天人之際」... 下句？", options: ["成一家之言", "通古今之變", "流芳百世", "以史為鏡"], answer: 1, correctMsg: "知我者謂我心憂。", wrongMsg: "唉。", reward: { knowledge: 15 }, penalty: { knowledge: -10 } },
+            { npc: "董仲舒", role: "儒學大師", question: "吾建議「罷黜百家」，獨尊哪一家？", options: ["道家", "法家", "墨家", "儒家"], answer: 3, correctMsg: "善哉。", wrongMsg: "朽木不可雕。", reward: { prestige: 10, knowledge: 5 }, penalty: { prestige: -5 } },
+            { npc: "王昭君", role: "和親公主", question: "我嫁給了哪位單于？", options: ["冒頓", "呼韓邪", "伊稚斜", "軍臣"], answer: 1, correctMsg: "願邊疆和平。", wrongMsg: "令人心寒。", reward: { reputation: 15 }, penalty: { reputation: -10 } },
+            { npc: "蔡倫", role: "發明家", question: "我改良造紙術，主要用了什麼原料？", options: ["絲綢", "樹皮與破布", "羊皮", "竹簡"], answer: 1, correctMsg: "物盡其用。", wrongMsg: "太昂貴了。", reward: { knowledge: 10, wealth: 5 }, penalty: { wealth: -5 } },
+            { npc: "張角", role: "太平道", question: "蒼天已死，黃天當立，歲在...？", options: ["甲子", "乙丑", "丙寅", "丁卯"], answer: 0, correctMsg: "天下大吉！", wrongMsg: "天時未到。", reward: { health: 10, wealth: 10 }, penalty: { reputation: -10 } },
+            { npc: "項羽", role: "霸王", question: "吾與劉邦決戰於何處？", options: ["鴻門", "咸陽", "垓下", "彭城"], answer: 2, correctMsg: "力拔山兮...", wrongMsg: "胡說！", reward: { health: 15 }, penalty: { health: -20 } }
+        ];
+
         const SceneDisplay = ({ imageName }) => {
             const [imgError, setImgError] = useState(false);
             const imageUrl = SceneImages[imageName] || SceneImages.Classroom;
@@ -494,11 +352,9 @@
                             onError={() => setImgError(true)}
                         />
                     ) : (
-                        <div className="w-full h-full flex items-center justify-center text-stone-500 bg-stone-900">
-                            <div className="text-center">
-                                <div className="text-4xl mb-2">🖼️</div>
-                                <div>圖片載入中...</div>
-                            </div>
+                        <div className="w-full h-full flex items-center justify-center text-stone-500 bg-stone-900 flex-col">
+                            <div className="text-4xl mb-2">🖼️</div>
+                            <div className="text-xs text-stone-400">請確認圖片: {imageUrl}</div>
                         </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
@@ -506,25 +362,24 @@
             );
         };
 
-        // --- 問答彈窗組件 ---
         const QuizModal = ({ quiz, onAnswer }) => {
             return (
                 <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 modal-enter">
-                    <div className="bg-[#2a2a2a] p-6 rounded border-4 border-purple-500 max-w-lg w-full text-center shadow-2xl relative">
-                        <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-purple-700 text-white px-4 py-1 rounded border-2 border-purple-400 shadow-lg">
+                    <div className="game-container p-6 max-w-lg w-full text-center relative bg-[#2a2a3a]">
+                        <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-purple-700 text-white px-4 py-1 border-2 border-purple-400 shadow-lg font-bold">
                             歷史名人堂
                         </div>
                         <h3 className="text-2xl font-bold text-purple-300 mb-2 mt-4">{quiz.npc} <span className="text-sm text-stone-400">({quiz.role})</span></h3>
                         <p className="text-lg text-stone-200 mb-6 border-b border-stone-600 pb-4">{quiz.question}</p>
                         <div className="grid grid-cols-1 gap-3">
                             {quiz.options.map((opt, idx) => (
-                                <button 
+                                <div 
                                     key={idx}
                                     onClick={() => onAnswer(idx)}
-                                    className="w-full py-3 bg-stone-700 hover:bg-purple-900 text-white border-2 border-stone-500 hover:border-purple-400 rounded transition-all"
+                                    className="option-block text-center py-3 hover:bg-purple-900 hover:border-purple-400"
                                 >
                                     {opt}
-                                </button>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -541,112 +396,87 @@
             const [nextSceneId, setNextSceneId] = useState(null);
             const [shake, setShake] = useState(false);
             const [quizEvent, setQuizEvent] = useState(null);
-            // 追蹤已遇過的名人
             const [seenEventIndices, setSeenEventIndices] = useState(new Set());
+            const [waitingForNext, setWaitingForNext] = useState(false);
 
             const currentScene = storyNodes[currentSceneId] || storyNodes['intro'];
 
-            // 觸發震動
-            const triggerShake = () => {
-                setShake(true);
-                setTimeout(() => setShake(false), 500);
-            };
+            const triggerShake = () => { setShake(true); setTimeout(() => setShake(false), 500); };
+            const showFeedback = (msg, type) => { setFeedback({ msg, type }); setTimeout(() => setFeedback(null), 3000); };
 
-            // 顯示反饋
-            const showFeedback = (msg, type) => {
-                setFeedback({ msg, type });
-                setTimeout(() => setFeedback(null), 3000); // 3秒閱讀時間
-            };
-
-            // 隨機事件檢查 (每關開始前)
+            // 隨機事件與結局邏輯
             useEffect(() => {
-                // 只有在非結局、非序章、非遊戲結束且當前沒有事件時才觸發
-                if (!currentSceneId.startsWith('ending') && currentSceneId !== 'intro' && currentSceneId !== 'game_over' && !quizEvent) {
-                    // 20% 機率觸發 (調整後)
+                if (currentScene?.isCalc) {
+                    let nextId = 'ending_commoner';
+                    if (stats.health <= 0) nextId = 'game_over';
+                    else {
+                        const { health, knowledge, wealth, reputation } = stats;
+                        if (reputation >= 100 && wealth >= 80 && knowledge >= 60) nextId = 'ending_emperor';
+                        else if (wealth >= 80 && knowledge >= 80 && reputation < 40) nextId = 'ending_official'; 
+                        else if (reputation >= 80 && health >= 60) nextId = 'ending_general';
+                        else if (knowledge >= 100 && health >= 60) nextId = 'ending_doctor'; 
+                        else if (knowledge >= 100) nextId = 'ending_scholar';
+                        else if (wealth >= 120 && reputation < 50) nextId = 'ending_exile'; 
+                        else if (wealth >= 100) nextId = 'ending_rich';
+                        else if (reputation >= 60 && health <= 30) nextId = 'ending_martyr'; 
+                        else nextId = 'ending_commoner';
+                    }
+                    setTimeout(() => setCurrentSceneId(nextId), 2000);
+                } else if (!currentSceneId.startsWith('ending') && currentSceneId !== 'intro' && currentSceneId !== 'game_over' && !quizEvent && !waitingForNext) {
                     if (Math.random() < 0.20) {
-                        // 過濾出尚未遇過的名人
-                        const availableIndices = historyQuizPool.map((_, i) => i).filter(i => !seenEventIndices.has(i));
-                        
-                        // 如果還有沒遇過的名人
+                        const availableIndices = randomEvents.map((_, i) => i).filter(i => !seenEventIndices.has(i));
                         if (availableIndices.length > 0) {
                             const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                            const randomQuiz = historyQuizPool[randomIndex];
-                            
-                            setQuizEvent(randomQuiz);
-                            // 將此索引加入已遇過集合
+                            setQuizEvent(randomEvents[randomIndex]);
                             setSeenEventIndices(prev => new Set(prev).add(randomIndex));
                         }
                     }
                 }
-            }, [currentSceneId]);
+            }, [currentSceneId, waitingForNext]);
 
-            // 處理問答
             const handleQuizAnswer = (answerIndex) => {
                 const isCorrect = answerIndex === quizEvent.answer;
                 let newStats = { ...stats };
                 let changes = [];
 
                 if (isCorrect) {
-                    if (quizEvent.reward.knowledge) { newStats.knowledge += quizEvent.reward.knowledge; changes.push({label:'智力', val:quizEvent.reward.knowledge, color:'text-blue-400'}); }
-                    if (quizEvent.reward.prestige) { newStats.reputation += quizEvent.reward.prestige; changes.push({label:'聲望', val:quizEvent.reward.prestige, color:'text-purple-400'}); }
-                    if (quizEvent.reward.health) { newStats.health += quizEvent.reward.health; changes.push({label:'體力', val:quizEvent.reward.health, color:'text-red-400'}); }
-                    if (quizEvent.reward.wealth) { newStats.wealth += quizEvent.reward.wealth; changes.push({label:'財富', val:quizEvent.reward.wealth, color:'text-yellow-400'}); }
-                    if (quizEvent.reward.reputation) { newStats.reputation += quizEvent.reward.reputation; changes.push({label:'聲望', val:quizEvent.reward.reputation, color:'text-purple-400'}); }
+                    if (quizEvent.reward.knowledge) { newStats.knowledge += quizEvent.reward.knowledge; changes.push({label:'智力', val:quizEvent.reward.knowledge, color:'bg-blue-500'}); }
+                    if (quizEvent.reward.prestige) { newStats.reputation += quizEvent.reward.prestige; changes.push({label:'聲望', val:quizEvent.reward.prestige, color:'bg-purple-500'}); }
+                    if (quizEvent.reward.health) { newStats.health += quizEvent.reward.health; changes.push({label:'體力', val:quizEvent.reward.health, color:'bg-red-500'}); }
+                    if (quizEvent.reward.wealth) { newStats.wealth += quizEvent.reward.wealth; changes.push({label:'財富', val:quizEvent.reward.wealth, color:'bg-yellow-500'}); }
+                    if (quizEvent.reward.reputation) { newStats.reputation += quizEvent.reward.reputation; changes.push({label:'聲望', val:quizEvent.reward.reputation, color:'bg-purple-500'}); }
+                    playSound('confirm');
                     showFeedback(`[✔ 正確] ${quizEvent.correctMsg}`, 'story');
                 } else {
-                    if (quizEvent.penalty.knowledge) { newStats.knowledge += quizEvent.penalty.knowledge; changes.push({label:'智力', val:quizEvent.penalty.knowledge, color:'text-stone-400'}); }
-                    if (quizEvent.penalty.prestige) { newStats.reputation += quizEvent.penalty.prestige; changes.push({label:'聲望', val:quizEvent.penalty.prestige, color:'text-stone-400'}); }
-                    if (quizEvent.penalty.health) { newStats.health += quizEvent.penalty.health; changes.push({label:'體力', val:quizEvent.penalty.health, color:'text-stone-400'}); }
-                    if (quizEvent.penalty.wealth) { newStats.wealth += quizEvent.penalty.wealth; changes.push({label:'財富', val:quizEvent.penalty.wealth, color:'text-stone-400'}); }
-                    if (quizEvent.penalty.reputation) { newStats.reputation += quizEvent.penalty.reputation; changes.push({label:'聲望', val:quizEvent.penalty.reputation, color:'text-stone-400'}); }
-                    showFeedback(`[❌ 錯誤] ${quizEvent.wrongMsg}`, 'error');
+                    if (quizEvent.penalty.knowledge) { newStats.knowledge += quizEvent.penalty.knowledge; changes.push({label:'智力', val:quizEvent.penalty.knowledge, color:'bg-gray-500'}); }
+                    if (quizEvent.penalty.prestige) { newStats.reputation += quizEvent.penalty.prestige; changes.push({label:'聲望', val:quizEvent.penalty.prestige, color:'bg-gray-500'}); }
+                    if (quizEvent.penalty.health) { newStats.health += quizEvent.penalty.health; changes.push({label:'體力', val:quizEvent.penalty.health, color:'bg-gray-500'}); }
+                    if (quizEvent.penalty.wealth) { newStats.wealth += quizEvent.penalty.wealth; changes.push({label:'財富', val:quizEvent.penalty.wealth, color:'bg-gray-500'}); }
+                    if (quizEvent.penalty.reputation) { newStats.reputation += quizEvent.penalty.reputation; changes.push({label:'聲望', val:quizEvent.penalty.reputation, color:'bg-gray-500'}); }
+                    playSound('error');
                     triggerShake();
+                    showFeedback(`[❌ 錯誤] ${quizEvent.wrongMsg}`, 'error');
                 }
-
                 setStats(newStats);
                 setFloatStats(changes);
-                setQuizEvent(null); // 關閉彈窗
+                setQuizEvent(null);
             };
 
-            // 處理結局計算
-            useEffect(() => {
-                if (currentScene?.isCalc) {
-                    let nextId = 'ending_commoner';
-                    if (stats.health <= 0) {
-                         nextId = 'game_over';
-                    } else {
-                        const { health, knowledge, wealth, reputation } = stats;
-                        // 擴充結局判斷邏輯
-                        if (reputation >= 100 && wealth >= 80 && knowledge >= 60) nextId = 'ending_emperor';
-                        else if (wealth >= 80 && knowledge >= 80 && reputation < 40) nextId = 'ending_official'; // 權臣
-                        else if (reputation >= 80 && health >= 60) nextId = 'ending_general';
-                        else if (knowledge >= 100 && health >= 60) nextId = 'ending_doctor'; // 醫聖
-                        else if (knowledge >= 100) nextId = 'ending_scholar';
-                        else if (wealth >= 120 && reputation < 50) nextId = 'ending_exile'; // 流亡富豪
-                        else if (wealth >= 100) nextId = 'ending_rich';
-                        else if (reputation >= 60 && health <= 30) nextId = 'ending_martyr'; // 烈士
-                        else nextId = 'ending_commoner';
-                    }
-                    setTimeout(() => setCurrentSceneId(nextId), 2000);
-                }
-            }, [currentSceneId, stats]);
-
-            // 處理選項點擊
             const handleChoice = (option, index) => {
-                // 條件檢查
-                if (option.reqKnowledge && stats.knowledge < option.reqKnowledge) { triggerShake(); showFeedback(`[❌ 智力不足] 需 ${option.reqKnowledge}`, 'error'); return; }
-                if (option.reqHealth && stats.health < option.reqHealth) { triggerShake(); showFeedback(`[❌ 體力不足] 需 ${option.reqHealth}`, 'error'); return; }
-                if (option.reqWealth && stats.wealth < option.reqWealth) { triggerShake(); showFeedback(`[❌ 財富不足] 需 ${option.reqWealth}`, 'error'); return; }
-                if (option.reqReputation && stats.reputation < option.reqReputation) { triggerShake(); showFeedback(`[❌ 聲望不足] 需 ${option.reqReputation}`, 'error'); return; }
+                if (option.reqKnowledge && stats.knowledge < option.reqKnowledge) { playSound('error'); triggerShake(); showFeedback(`[❌ 智力不足] 需 ${option.reqKnowledge}`, 'error'); return; }
+                if (option.reqHealth && stats.health < option.reqHealth) { playSound('error'); triggerShake(); showFeedback(`[❌ 體力不足] 需 ${option.reqHealth}`, 'error'); return; }
+                if (option.reqWealth && stats.wealth < option.reqWealth) { playSound('error'); triggerShake(); showFeedback(`[❌ 財富不足] 需 ${option.reqWealth}`, 'error'); return; }
+                if (option.reqReputation && stats.reputation < option.reqReputation) { playSound('error'); triggerShake(); showFeedback(`[❌ 聲望不足] 需 ${option.reqReputation}`, 'error'); return; }
 
+                playSound('select');
                 setSelectedOption(index);
-                
-                // 數值變化與動畫
+                setWaitingForNext(true);
+
                 let newStats = { ...stats };
                 let changes = [];
                 const effect = option.effect || {};
                 
-                if (effect.health) { newStats.health += effect.health; changes.push({label:'體力', val:effect.health, color: effect.health>0?'text-red-400':'text-stone-400'}); }
+                if (effect.health) { newStats.health += effect.health; changes.push({label:'體力', val:effect.health, color: effect.health>0?'text-green-400':'text-red-400'}); }
                 if (effect.knowledge) { newStats.knowledge += effect.knowledge; changes.push({label:'智力', val:effect.knowledge, color: 'text-blue-400'}); }
                 if (effect.wealth) { newStats.wealth += effect.wealth; changes.push({label:'財富', val:effect.wealth, color: 'text-yellow-400'}); }
                 if (effect.reputation) { newStats.reputation += effect.reputation; changes.push({label:'聲望', val:effect.reputation, color: 'text-purple-400'}); }
@@ -654,28 +484,28 @@
                 if (newStats.health < 0) newStats.health = 0;
                 setStats(newStats);
                 setFloatStats(changes);
-
                 if (option.feedback) showFeedback(`[✔] ${option.feedback}`, 'story');
                 
                 if (newStats.health <= 0) setNextSceneId('game_over');
                 else setNextSceneId(option.nextId);
             };
 
-            // 下一步
             const handleNext = () => {
+                playSound('confirm');
                 setCurrentSceneId(nextSceneId);
                 setSelectedOption(null);
+                setWaitingForNext(false);
                 setNextSceneId(null);
                 setFloatStats([]);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             };
 
-            // 重置
             const resetGame = () => {
+                playSound('confirm');
                 setCurrentSceneId('intro');
                 setStats({ health: 100, knowledge: 10, wealth: 20, reputation: 0 });
                 setSelectedOption(null);
-                setNextSceneId(null);
+                setWaitingForNext(false);
                 setFloatStats([]);
                 setQuizEvent(null);
                 setSeenEventIndices(new Set());
@@ -685,31 +515,19 @@
 
             return (
                 <div className="min-h-screen flex items-center justify-center py-6 px-4">
-                    <div className={`max-w-2xl w-full scroll-container rounded-lg relative ${shake ? 'shake' : ''}`}>
+                    <div className={`max-w-2xl w-full scroll-container rounded-lg relative ${shake ? 'shake' : ''} game-container`}>
                         
-                        {/* 狀態欄 HUD (四色區分) */}
-                        <div className="bg-[#222] text-amber-100 p-4 border-b-4 border-[#8b7355] sticky top-0 z-30 shadow-lg">
+                        {/* HUD (Visualized Progress Bars) */}
+                        <div className="bg-[#222] text-amber-100 p-4 border-b-4 border-[#5C5B7F] sticky top-0 z-30 shadow-lg">
                             <div className="flex justify-between items-center mb-3">
                                 <h1 className="text-3xl font-bold tracking-widest text-yellow-300">秦漢風雲</h1>
                                 <div className="text-sm text-stone-300 font-mono">關卡 {currentScene.title.split('.')[0]}</div>
                             </div>
-                            <div className="grid grid-cols-4 gap-2">
-                                <div className="bg-red-900/80 p-2 rounded border-2 border-red-600 flex flex-col items-center shadow-inner">
-                                    <div className="text-xs text-red-200 mb-1 flex items-center gap-1"><Icons.Heart/> 體力</div>
-                                    <span className="font-bold text-lg text-white">{stats.health}</span>
-                                </div>
-                                <div className="bg-blue-900/80 p-2 rounded border-2 border-blue-600 flex flex-col items-center shadow-inner">
-                                    <div className="text-xs text-blue-200 mb-1 flex items-center gap-1"><Icons.Brain/> 智力</div>
-                                    <span className="font-bold text-lg text-white">{stats.knowledge}</span>
-                                </div>
-                                <div className="bg-yellow-700/80 p-2 rounded border-2 border-yellow-500 flex flex-col items-center shadow-inner">
-                                    <div className="text-xs text-yellow-100 mb-1 flex items-center gap-1"><Icons.Coin/> 財富</div>
-                                    <span className="font-bold text-lg text-white">{stats.wealth}</span>
-                                </div>
-                                <div className="bg-purple-900/80 p-2 rounded border-2 border-purple-600 flex flex-col items-center shadow-inner">
-                                    <div className="text-xs text-purple-200 mb-1 flex items-center gap-1"><Icons.Star/> 聲望</div>
-                                    <span className="font-bold text-lg text-white">{stats.reputation}</span>
-                                </div>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                <StatBar label="體力" value={stats.health} max={150} color="bg-red-600" icon={<Icons.Heart/>} />
+                                <StatBar label="智力" value={stats.knowledge} max={150} color="bg-blue-600" icon={<Icons.Brain/>} />
+                                <StatBar label="財富" value={stats.wealth} max={150} color="bg-yellow-500" icon={<Icons.Coin/>} />
+                                <StatBar label="聲望" value={stats.reputation} max={150} color="bg-purple-600" icon={<Icons.Star/>} />
                             </div>
                         </div>
 
@@ -727,78 +545,73 @@
                                     </div>
                                 ))}
                             </div>
-
-                            {/* 提示訊息 (置中) */}
+                            
+                            {/* Feedback */}
                             {feedback && (
-                                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 px-8 py-5 bg-stone-800 text-amber-100 border-4 border-amber-500 shadow-2xl text-center font-bold rounded-lg animate-bounce text-lg">
+                                <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 px-6 py-4 bg-stone-900 text-yellow-300 border-4 border-yellow-500 shadow-xl text-center font-bold rounded-none animate-in fade-in zoom-in duration-300">
                                     {feedback.msg}
                                 </div>
                             )}
 
                             {/* 標題 */}
-                            <h2 className="text-3xl font-bold text-center mb-6 text-amber-200 border-b-2 border-stone-600 pb-3">{currentScene.title}</h2>
+                            <h2 className="text-3xl font-bold text-center mb-6 text-amber-200 border-b-4 border-stone-600 pb-3">{currentScene.title}</h2>
                             
                             {/* 場景圖 */}
                             {!currentScene.isCalc && <SceneDisplay imageName={currentScene.image} />}
 
-                            {/* 故事文本 */}
-                            <div className="text-lg text-stone-300 leading-relaxed mb-8 p-4 bg-[#2a2a2a] border border-stone-600 rounded-lg shadow-inner tracking-wide">
-                                {currentScene.text}
+                            {/* 故事文本 (打字機效果) */}
+                            <div className="text-lg text-stone-200 leading-relaxed mb-8 p-4 bg-[#3b3a5d] border-2 border-stone-600 rounded-none shadow-inner min-h-[100px]">
+                                <TypewriterText text={currentScene.text} />
                             </div>
 
-                            {/* 選項區域 */}
-                            <div className="grid gap-5">
+                            <div className="grid gap-4">
                                 {!isEnding ? (
                                     currentScene.options.map((opt, idx) => (
                                         <div 
                                             key={idx}
                                             onClick={() => !nextSceneId && handleChoice(opt, idx)}
-                                            className={`relative p-5 rounded transition-all game-btn ${
+                                            className={`option-block ${
                                                 selectedOption === idx 
                                                     ? 'selected' 
                                                     : nextSceneId !== null 
-                                                        ? 'opacity-40 cursor-default grayscale' 
-                                                        : 'hover:border-yellow-300'
-                                            } ${nextSceneId && selectedOption !== idx ? 'pointer-events-none' : ''}`}
+                                                        ? 'disabled' 
+                                                        : ''
+                                            } ${nextSceneId && selectedOption !== idx ? 'pointer-events-none opacity-50' : ''}`}
                                         >
                                             <div className="flex justify-between items-center font-bold text-lg mb-1">
                                                 <span>{opt.text}</span>
-                                                {selectedOption === idx && <span className="text-yellow-300 text-sm animate-pulse">◄ 已選</span>}
+                                                {selectedOption === idx && <span className="text-yellow-800 text-sm animate-pulse">◄ 已選</span>}
                                             </div>
                                             
-                                            {/* 條件提示 (未選擇時顯示) */}
                                             {!nextSceneId && (
-                                                <div className="text-xs text-stone-400 flex flex-wrap gap-x-4 mt-2 font-mono">
-                                                    {opt.reqKnowledge && <span className="text-blue-400">🧠 需智力 {opt.reqKnowledge}</span>}
-                                                    {opt.reqHealth && <span className="text-red-400">❤ 需體力 {opt.reqHealth}</span>}
-                                                    {opt.reqWealth && <span className="text-yellow-400">💰 需財富 {opt.reqWealth}</span>}
-                                                    {opt.reqReputation && <span className="text-purple-400">👑 需聲望 {opt.reqReputation}</span>}
+                                                <div className="text-xs flex flex-wrap gap-x-4 mt-2 font-mono opacity-80">
+                                                    {opt.reqKnowledge && <span className="bg-blue-900 px-1 text-white">智 {opt.reqKnowledge}</span>}
+                                                    {opt.reqHealth && <span className="bg-red-900 px-1 text-white">體 {opt.reqHealth}</span>}
+                                                    {opt.reqWealth && <span className="bg-yellow-900 px-1 text-white">財 {opt.reqWealth}</span>}
+                                                    {opt.reqReputation && <span className="bg-purple-900 px-1 text-white">聲 {opt.reqReputation}</span>}
                                                 </div>
                                             )}
 
-                                            {/* 選擇後展開：數值變化與史實小講堂 */}
                                             {selectedOption === idx && nextSceneId !== null && (
-                                                <div className="mt-4 pt-4 border-t-2 border-stone-500/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                    {/* 數值結果 */}
+                                                <div className="mt-4 pt-4 border-t-2 border-stone-500/50 animate-in fade-in slide-in-from-top-2 duration-300 text-black">
                                                     <div className="flex flex-wrap gap-4 font-bold mb-4 text-sm bg-black/20 p-2 rounded">
-                                                        {opt.effect?.health !== 0 && <span className={opt.effect.health>0?'text-red-400':'text-stone-400'}>體力{opt.effect.health>0?'+':''}{opt.effect.health}</span>}
-                                                        {opt.effect?.wealth !== 0 && <span className="text-yellow-400">財富{opt.effect.wealth>0?'+':''}{opt.effect.wealth}</span>}
-                                                        {opt.effect?.reputation !== 0 && <span className="text-purple-400">聲望{opt.effect.reputation>0?'+':''}{opt.effect.reputation}</span>}
-                                                        {opt.effect?.knowledge !== 0 && <span className="text-blue-400">智力{opt.effect.knowledge>0?'+':''}{opt.effect.knowledge}</span>}
+                                                        {opt.effect?.health !== 0 && <span className={opt.effect.health>0?'text-green-700':'text-red-700'}>體力{opt.effect.health>0?'+':''}{opt.effect.health}</span>}
+                                                        {opt.effect?.wealth !== 0 && <span className="text-yellow-700">財富{opt.effect.wealth>0?'+':''}{opt.effect.wealth}</span>}
+                                                        {opt.effect?.reputation !== 0 && <span className="text-purple-700">聲望{opt.effect.reputation>0?'+':''}{opt.effect.reputation}</span>}
+                                                        {opt.effect?.knowledge !== 0 && <span className="text-blue-700">智力{opt.effect.knowledge>0?'+':''}{opt.effect.knowledge}</span>}
+                                                        {(!opt.effect || Object.values(opt.effect).every(v => v === 0)) && <span className="text-gray-500">數值無變化</span>}
                                                     </div>
                                                     
-                                                    {/* 歷史小講堂 (黃色卷軸風格) */}
                                                     {opt.historyNote && (
-                                                        <div className="bg-[#3d362a] p-4 rounded text-base text-amber-100 border-l-4 border-amber-500 mb-5 shadow-md">
-                                                            <strong className="block text-amber-400 mb-2 text-lg border-b border-amber-700/50 pb-1">📜 歷史小講堂</strong>
+                                                        <div className="bg-[#fdf6e3] p-3 rounded-none text-sm text-stone-800 border-2 border-[#d4a017] mb-4 shadow-inner">
+                                                            <strong className="block text-[#8b4513] mb-1 border-b border-[#d4a017] pb-1">📜 歷史小講堂</strong>
                                                             {opt.historyNote}
                                                         </div>
                                                     )}
                                                     
-                                                    {/* 下一步按鈕 */}
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); handleNext(); }}
-                                                        className="w-full bg-green-700 text-white py-3 font-bold rounded hover:bg-green-600 flex items-center justify-center gap-2 shadow-xl border-2 border-green-500 transition-transform active:scale-95"
+                                                        className="w-full next-btn py-3 font-bold rounded flex items-center justify-center gap-2 shadow-xl transition-transform active:scale-95"
                                                     >
                                                         前往下一關 <Icons.ArrowRight/>
                                                     </button>
@@ -807,10 +620,10 @@
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="text-center p-8 bg-[#2a2a2a] rounded-lg border-2 border-stone-600">
+                                    <div className="text-center p-8 bg-[#2a2a2a] border-4 border-stone-600 shadow-xl">
                                         <h3 className="text-3xl text-yellow-300 font-bold mb-4 border-b border-stone-500 pb-4">— 歷史的終章 —</h3>
                                         <div className="text-xl text-stone-200 mb-8 leading-relaxed">{currentScene.text}</div>
-                                        <button onClick={resetGame} className="w-full bg-red-700 text-white py-4 font-bold text-xl rounded hover:bg-red-600 flex items-center justify-center gap-2 shadow-xl border-2 border-red-500 transition-transform active:scale-95">
+                                        <button onClick={resetGame} className="pixel-btn w-full py-4 font-bold text-xl text-yellow-300 border-yellow-600">
                                             <Icons.Refresh/> 重啟時光之旅
                                         </button>
                                     </div>
