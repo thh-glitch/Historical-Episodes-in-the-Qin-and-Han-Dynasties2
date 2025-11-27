@@ -314,7 +314,7 @@
 
         // --- 完整歷史劇本資料 (完全保留原內容) ---
         const storyNodes = {
-            "intro": { id: "intro", title: "序章：歷史的召喚", text: "西元2024年。歷史課上，老師講述著：「秦皇漢武，略輸文采...」你的思緒飄向了兩千年前的時空漩渦。", image: "Classroom", options: [{ text: "認真聽課", nextId: "qin_war", effect: { knowledge: 10 }, feedback: "知識就是力量。", historyNote: "歷史學習能幫助我們以古鑑今。" }, { text: "睡覺儲存體力", nextId: "qin_war", effect: { health: 10 }, feedback: "精神飽滿地穿越了。", historyNote: "穿越故事往往始於意外。" }, { text: "偷看課外書", nextId: "qin_war", effect: { wealth: 5, reputation: -5 }, feedback: "獲得了一些雜學。", historyNote: "古代也有閒書。" }] },
+            "intro": { id: "intro", title: "序章：歷史的召喚", text: "西元2025年。中國歷史課上，鄧老師講述著秦皇漢武的風雲變幻，你的思緒飄向了兩千年前的時空漩渦。", image: "Classroom", options: [{ text: "認真聽課", nextId: "qin_war", effect: { knowledge: 10 }, feedback: "知識就是力量。", historyNote: "歷史學習能幫助我們以古鑑今。" }, { text: "睡覺儲存體力", nextId: "qin_war", effect: { health: 10 }, feedback: "精神飽滿地穿越了。", historyNote: "穿越故事往往始於意外。" }, { text: "偷看課外書", nextId: "qin_war", effect: { wealth: 5, reputation: -5 }, feedback: "獲得了一些雜學。", historyNote: "古代也有閒書。" }] },
             "qin_war": { id: "qin_war", title: "1. 秦滅六國 (BC 230-221)", text: "你置身於秦軍大帳。秦王嬴政欲一統天下，滅國之戰一觸即發。", image: "War", options: [{ text: "獻計「遠交近攻」", nextId: "qin_system", reqKnowledge: 15, effect: { knowledge: 15, reputation: 10, health: -5, wealth: 10 }, feedback: "策略被採納！", historyNote: "范雎提出的戰略。" }, { text: "親上前線殺敵", nextId: "qin_system", effect: { health: -10, wealth: 20, reputation: 5 }, feedback: "獲得軍功爵位。", historyNote: "秦國實行軍功爵制。" }, { text: "擔任軍需官", nextId: "qin_system", reqWealth: 10, effect: { wealth: 30, reputation: -5 }, feedback: "確保糧草充足。", historyNote: "秦國農業發達。" }] },
             "qin_system": { id: "qin_system", title: "2. 制度確立 (BC 221)", text: "朝廷爭論實行「郡縣制」還是「分封制」。", image: "QinPalace", options: [{ text: "支持李斯(郡縣)", nextId: "qin_standard", effect: { knowledge: 20, reputation: 10 }, feedback: "中央集權確立！", historyNote: "李斯反對分封。" }, { text: "支持王綰(分封)", nextId: "qin_standard", reqReputation: 10, effect: { reputation: -10, health: -5 }, feedback: "建議被駁回。", historyNote: "王綰認為邊遠難治。" }, { text: "提出折中方案", nextId: "qin_standard", reqKnowledge: 20, effect: { knowledge: 10, reputation: 5 }, feedback: "展現了智慧。", historyNote: "後來的郡國並行制。" }] },
             "qin_standard": { id: "qin_standard", title: "3. 統一度量衡", text: "秦始皇下令統一度量衡與文字。", image: "Treasury", options: [{ text: "推廣小篆", nextId: "qin_construction", reqKnowledge: 30, effect: { knowledge: 15, reputation: 10, wealth: 10 }, feedback: "文化傳承。", historyNote: "書同文。" }, { text: "兌換秦半兩", nextId: "qin_construction", effect: { wealth: 20 }, feedback: "資產保值。", historyNote: "統一貨幣。" }, { text: "私藏舊幣", nextId: "qin_construction", effect: { knowledge: -10, health: -20 }, feedback: "因抗法受傷。", historyNote: "舊標準失效。" }] },
@@ -675,4 +675,5 @@
     </script>
 </body>
 </html>
+
 
