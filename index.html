@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>時光行者：秦漢風雲 (最終完美修復版)</title>
+    <title>時光行者：秦漢風雲 (HUD優化版)</title>
     
-    <!-- 引入 Tailwind CSS -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 React 和 ReactDOM -->
+    <!-- React & ReactDOM -->
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
-    <!-- 引入 Babel -->
+    <!-- Babel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
-    <!-- 引入像素字體 -->
+    <!-- Pixel Font -->
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 全局設定 --- */
+        /* 1. 全局設定 */
         body {
             font-family: 'DotGothic16', 'Noto Serif TC', monospace;
             background-color: #1a1a1a;
@@ -29,57 +29,46 @@
             background-size: 20px 20px;
         }
 
-        /* --- 遊戲容器 --- */
+        /* 2. 遊戲主容器 */
         .game-container {
-            background-color: #222034; /* 深紫灰底色 */
             border: 4px solid #5C5B7F;
             box-shadow: 
-                0 0 0 4px #1a1a1a,
-                0 20px 50px rgba(0,0,0,0.9);
-            position: relative;
+                0 0 0 4px #222,
+                0 0 40px rgba(0,0,0,0.8);
+            background-color: #2d2b40; /* 深色底 */
+            max-width: 800px;
         }
-
-        /* --- 核心修復：像素色塊選項按鈕 --- */
+        
+        /* 3. 核心：像素色塊按鈕 */
         .option-block {
             position: relative;
             display: block;
             width: 100%;
-            background-color: #383850; /* 預設深色塊 */
+            background-color: #383850;
             color: #fff;
             padding: 16px;
             margin-bottom: 12px;
             cursor: pointer;
-            
-            /* 像素立體邊框效果 */
             border: 3px solid;
-            border-color: #5d5d8a #1e1e2e #1e1e2e #5d5d8a; /* 左上亮，右下暗 */
-            
-            /* 硬陰影 */
+            border-color: #5d5d8a #1e1e2e #1e1e2e #5d5d8a;
             box-shadow: 4px 4px 0px #111;
-            
             transition: transform 0.1s, background-color 0.1s;
             text-align: left;
         }
-
-        /* 滑鼠懸停 */
         .option-block:hover:not(.disabled):not(.selected) {
             background-color: #4b4b70;
             transform: translate(-1px, -1px);
             box-shadow: 5px 5px 0px #111;
             border-color: #7a7aae #2a2a4a #2a2a4a #7a7aae;
         }
-
-        /* 選中狀態 (金色高亮) */
         .option-block.selected {
-            background-color: #e6c229; /* 金色 */
-            color: #2a2a4a; /* 深色文字 */
+            background-color: #e6c229;
+            color: #2a2a4a;
             border-color: #ffe66d #b39200 #b39200 #ffe66d;
-            transform: translate(2px, 2px); /* 下壓效果 */
-            box-shadow: 2px 2px 0px #111; /* 陰影變小 */
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #111;
             cursor: default;
         }
-
-        /* 禁用/未選中狀態 (變暗) */
         .option-block.disabled {
             background-color: #252530;
             color: #555;
@@ -89,7 +78,7 @@
             cursor: not-allowed;
         }
 
-        /* --- 下一步按鈕 (綠色) --- */
+        /* 4. 下一步按鈕 */
         .next-btn {
             background-color: #4caf50;
             border: 3px solid;
@@ -100,26 +89,62 @@
         .next-btn:hover { background-color: #66bb6a; }
         .next-btn:active { transform: translate(2px, 2px); box-shadow: none; border-color: #2e7d32; }
 
-        /* --- 圖片容器 --- */
+        /* 5. 圖片容器 */
         .scene-image-container {
             border: 4px solid #2b2b2b;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-            image-rendering: pixelated; /* 像素圖不模糊 */
+            image-rendering: pixelated;
             background-color: #000;
             min-height: 250px;
         }
 
-        /* --- 進度條 --- */
-        .progress-container {
-            background-color: #111;
-            border: 2px solid #444;
-            height: 16px;
-            position: relative;
-            border-radius: 2px;
+        /* --- [核心修改]：狀態條樣式 (參考 RPG 血條風格) --- */
+        .stat-bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
         }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .progress-container {
+            background-color: #000; /* 深黑底色 */
+            border: 2px solid #555;
+            border-radius: 4px;
+            height: 24px; /* 增高，更易讀 */
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+        }
+
         .progress-fill {
             height: 100%;
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* 彈性動畫 */
+            transition: width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); /* 平滑過渡 */
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), inset -2px 0 0 rgba(0,0,0,0.1); /* 立體感 */
+        }
+
+        /* 數值文字 (疊加在條上) */
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000, -1px -1px 0 #000; /* 描邊字確保清晰 */
+            z-index: 10;
         }
 
         /* --- 浮動數值 --- */
@@ -234,22 +259,28 @@
             return <span>{displayedText}</span>;
         };
 
-        // --- 進度條組件 (像素風格) ---
+        // --- [核心修改]：視覺化狀態條組件 ---
         const StatBar = ({ label, value, max = 150, color, icon }) => {
             const percent = Math.min(100, Math.max(0, (value / max) * 100));
             return (
-                <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 text-center text-xl filter drop-shadow-md">{icon}</div>
-                    <div className="w-10 text-xs font-bold text-gray-300 text-right tracking-widest">{label}</div>
-                    <div className="flex-grow progress-container">
-                        <div className={`progress-fill ${color}`} style={{ width: `${percent}%` }}></div>
+                <div className="stat-bar-wrapper w-full px-2">
+                    <div className="stat-header">
+                        <span className="flex items-center gap-1 font-bold">{icon} {label}</span>
                     </div>
-                    <div className="w-8 text-right text-xs font-mono text-white drop-shadow">{value}</div>
+                    <div className="progress-container">
+                        <div 
+                            className={`progress-fill ${color}`} 
+                            style={{ width: `${percent}%` }}
+                        ></div>
+                        <div className="progress-text">
+                            {value} / {max}
+                        </div>
+                    </div>
                 </div>
             );
         };
 
-        // --- 圖片路徑 (本地檔案) ---
+        // --- 圖片路徑 (完全保留原設定) ---
         const SceneImages = {
             Classroom: "1.Classroom.webp",
             QinPalace: "2.QinPalace.webp",
@@ -273,15 +304,15 @@
 
         // --- UI 圖示 ---
         const Icons = {
-            Heart: () => <span>❤️</span>,
-            Brain: () => <span>🧿</span>,
-            Coin: () => <span>🪙</span>,
+            Heart: () => <span>❤</span>,
+            Brain: () => <span>🧠</span>,
+            Coin: () => <span>💰</span>,
             Star: () => <span>👑</span>,
             ArrowRight: () => <span>▶</span>,
             Refresh: () => <span>↺</span>
         };
 
-        // --- 歷史劇本資料 (完整 25 關) ---
+        // --- 完整歷史劇本資料 (完全保留原內容) ---
         const storyNodes = {
             "intro": { id: "intro", title: "序章：歷史的召喚", text: "西元2024年。歷史課上，老師講述著：「秦皇漢武，略輸文采...」你的思緒飄向了兩千年前的時空漩渦。", image: "Classroom", options: [{ text: "認真聽課", nextId: "qin_war", effect: { knowledge: 10 }, feedback: "知識就是力量。", historyNote: "歷史學習能幫助我們以古鑑今。" }, { text: "睡覺儲存體力", nextId: "qin_war", effect: { health: 10 }, feedback: "精神飽滿地穿越了。", historyNote: "穿越故事往往始於意外。" }, { text: "偷看課外書", nextId: "qin_war", effect: { wealth: 5, reputation: -5 }, feedback: "獲得了一些雜學。", historyNote: "古代也有閒書。" }] },
             "qin_war": { id: "qin_war", title: "1. 秦滅六國 (BC 230-221)", text: "你置身於秦軍大帳。秦王嬴政欲一統天下，滅國之戰一觸即發。", image: "War", options: [{ text: "獻計「遠交近攻」", nextId: "qin_system", reqKnowledge: 15, effect: { knowledge: 15, reputation: 10, health: -5, wealth: 10 }, feedback: "策略被採納！", historyNote: "范雎提出的戰略。" }, { text: "親上前線殺敵", nextId: "qin_system", effect: { health: -10, wealth: 20, reputation: 5 }, feedback: "獲得軍功爵位。", historyNote: "秦國實行軍功爵制。" }, { text: "擔任軍需官", nextId: "qin_system", reqWealth: 10, effect: { wealth: 30, reputation: -5 }, feedback: "確保糧草充足。", historyNote: "秦國農業發達。" }] },
@@ -324,7 +355,7 @@
             "game_over": { id: "game_over", title: "壯志未酬", text: "你倒在了歷史的長河中...", image: "Fire" }
         };
 
-        // 隨機事件
+        // 隨機事件 (完整)
         const randomEvents = [
             { name: "李斯", role: "秦朝丞相", question: "吾提議廢分封，行郡縣。你可知秦朝將天下分為多少郡？", options: ["十二郡", "三十六郡", "四十八郡", "八十一郡"], answer: 1, correctMsg: "然也！集權中央。", wrongMsg: "謬矣！", reward: { knowledge: 10, prestige: 5 }, penalty: { knowledge: -5 } },
             { npc: "荊軻", role: "燕國刺客", question: "風蕭蕭兮易水寒... 下一句為何？", options: ["壯士一去兮不復還", "大風起兮雲飛揚", "力拔山兮氣蓋世", "此恨綿綿無絕期"], answer: 0, correctMsg: "懂我者，壯士也！", wrongMsg: "不懂風雅。", reward: { health: 10, reputation: 5 }, penalty: { reputation: -5 } },
@@ -404,7 +435,7 @@
             const triggerShake = () => { setShake(true); setTimeout(() => setShake(false), 500); };
             const showFeedback = (msg, type) => { setFeedback({ msg, type }); setTimeout(() => setFeedback(null), 3000); };
 
-            // 隨機事件與結局邏輯
+            // 隨機事件邏輯
             useEffect(() => {
                 if (currentScene?.isCalc) {
                     let nextId = 'ending_commoner';
@@ -632,7 +663,7 @@
                         </div>
                         
                         <div className="bg-[#1A192A] text-[#5C5B7F] text-center py-2 text-xs font-mono border-t-4 border-[#5C5B7F]">
-                            時光行者 RPG - 秦漢風雲 (2024)
+                            時光行者 RPG - 秦漢風雲 (THH 2025)
                         </div>
                     </div>
                 </div>
